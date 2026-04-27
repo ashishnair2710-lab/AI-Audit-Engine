@@ -1,58 +1,46 @@
 import { useState } from "react";
 
-const SEVERITY_CONFIG = {
-  CRITICAL: { label: "Critical", bg: "badge-critical", dot: "bg-red-400",    border: "border-red-500/20",    glow: "hover:border-red-500/40"    },
-  HIGH:     { label: "High",     bg: "badge-high",     dot: "bg-orange-400", border: "border-orange-500/20", glow: "hover:border-orange-500/40" },
-  MEDIUM:   { label: "Medium",   bg: "badge-medium",   dot: "bg-yellow-400", border: "border-yellow-500/20", glow: "hover:border-yellow-500/40" },
-  LOW:      { label: "Low",      bg: "badge-low",      dot: "bg-slate-400",  border: "border-slate-500/20",  glow: "hover:border-slate-500/40"  },
+const SEV = {
+  CRITICAL: { label: "Critical", cls: "badge-critical", dot: "bg-red-500"    },
+  HIGH:     { label: "High",     cls: "badge-high",     dot: "bg-orange-500"  },
+  MEDIUM:   { label: "Medium",   cls: "badge-medium",   dot: "bg-yellow-500"  },
+  LOW:      { label: "Low",      cls: "badge-low",      dot: "bg-slate-400"   },
 };
 
 export default function IssueCard({ severity, title, impact, action, index }) {
-  const [expanded, setExpanded] = useState(false);
-  const config = SEVERITY_CONFIG[severity] || SEVERITY_CONFIG.LOW;
+  const [open, setOpen] = useState(false);
+  const s = SEV[severity] || SEV.LOW;
 
   return (
     <div
-      className={`card-dark border ${config.border} ${config.glow} transition-all duration-200 cursor-pointer animate-slide-up`}
-      style={{ animationDelay: `${index * 60}ms` }}
-      onClick={() => setExpanded(!expanded)}
+      className="card p-4 cursor-pointer hover:shadow-lifted transition-all duration-200 animate-slide-up"
+      style={{ animationDelay: `${index * 50}ms` }}
+      onClick={() => setOpen(!open)}
     >
-      <div className="p-5">
-        <div className="flex items-start gap-3">
-          {/* Severity dot + badge */}
-          <div className="flex-shrink-0 mt-0.5">
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold ${config.bg}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
-              {config.label}
-            </span>
-          </div>
-
-          {/* Title */}
-          <p className="text-white text-sm font-medium leading-snug flex-1">{title}</p>
-
-          {/* Expand chevron */}
-          <svg
-            className={`flex-shrink-0 w-4 h-4 text-brand-muted transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-
-        {/* Expanded detail */}
-        {expanded && (
-          <div className="mt-4 pt-4 border-t border-brand-border space-y-3 animate-fade-in">
-            <div>
-              <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1">Business Impact</p>
-              <p className="text-slate-300 text-sm leading-relaxed">{impact}</p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-brand-green uppercase tracking-wider mb-1">Recommended Fix</p>
-              <p className="text-slate-300 text-sm leading-relaxed">{action}</p>
-            </div>
-          </div>
-        )}
+      <div className="flex items-start gap-3">
+        <span className={`flex-shrink-0 mt-0.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold ${s.cls}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+          {s.label}
+        </span>
+        <p className="text-brand-text text-sm font-medium leading-snug flex-1">{title}</p>
+        <svg className={`flex-shrink-0 w-4 h-4 text-brand-muted mt-0.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
       </div>
+
+      {open && (
+        <div className="mt-4 pt-4 border-t border-brand-border space-y-3 animate-fade-in">
+          <div>
+            <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1">Business Impact</p>
+            <p className="text-brand-subtext text-sm leading-relaxed">{impact}</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-brand-purple uppercase tracking-wider mb-1">Recommended Fix</p>
+            <p className="text-brand-subtext text-sm leading-relaxed">{action}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

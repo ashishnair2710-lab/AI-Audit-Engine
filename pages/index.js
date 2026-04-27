@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState }  from "react";
 import { useRouter } from "next/router";
 import Head          from "next/head";
 import Navbar        from "../components/Navbar";
@@ -6,42 +6,24 @@ import { mockAuditPayload } from "../data/mockData";
 
 export default function HomePage() {
   const router  = useRouter();
-  const [json,    setJson]    = useState(JSON.stringify(mockAuditPayload, null, 2));
-  const [error,   setError]   = useState("");
   const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState("");
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError("");
+  async function runAudit() {
     setLoading(true);
-
-    let parsed;
-    try {
-      parsed = JSON.parse(json);
-    } catch {
-      setError("Invalid JSON — please check your input.");
-      setLoading(false);
-      return;
-    }
-
+    setError("");
     try {
       const res  = await fetch("/api/audit", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(parsed),
+        body:    JSON.stringify(mockAuditPayload),
       });
       const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Audit failed.");
-        setLoading(false);
-        return;
-      }
-
+      if (!res.ok) { setError(data.error || "Audit failed."); setLoading(false); return; }
       sessionStorage.setItem("auditResult", JSON.stringify(data));
       router.push("/audit/results");
     } catch {
-      setError("Network error — is the dev server running?");
+      setError("Network error. Please try again.");
       setLoading(false);
     }
   }
@@ -50,88 +32,149 @@ export default function HomePage() {
     <>
       <Head>
         <title>AI Full Funnel Audit Engine</title>
-        <meta name="description" content="Analyse Meta and Google Ads performance across the full funnel." />
+        <meta name="description" content="Analyse Meta and Google Ads across the full funnel." />
       </Head>
 
       <div className="min-h-screen bg-brand-bg">
         <Navbar />
 
-        <main className="pt-28 pb-20 px-6 max-w-4xl mx-auto">
-          {/* Hero */}
-          <div className="text-center mb-10 animate-fade-in">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-green/10 border border-brand-green/20 text-brand-green text-xs font-semibold uppercase tracking-widest mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse" />
-              Decision Engine
+        <main className="pt-28 pb-24 px-6 max-w-5xl mx-auto">
+
+          {/* ── Hero ── */}
+          <div className="text-center mb-16 animate-fade-in">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-lavender border border-purple-200 text-brand-purple text-xs font-semibold uppercase tracking-widest mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-purple" />
+              AI Decision Engine
             </span>
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-brand-navy leading-tight mb-4">
-              AI Full Funnel<br />
-              <span className="text-brand-green">Audit Engine</span>
+            <h1 className="text-5xl sm:text-6xl font-extrabold text-brand-navy leading-tight mb-5">
+              Full Funnel<br />
+              <span className="text-brand-purple">Audit Engine</span>
             </h1>
-            <p className="text-slate-500 text-lg max-w-xl mx-auto leading-relaxed">
-              Analyse Meta + Google Ads across the full funnel. Get prioritised fixes, wasted spend alerts, and competitor gap analysis — in seconds.
+            <p className="text-brand-muted text-xl max-w-2xl mx-auto leading-relaxed">
+              Stop guessing. Know exactly where your Meta and Google budget is leaking — and what to fix first.
             </p>
           </div>
 
-          {/* Card */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden animate-slide-up">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <div>
-                <h2 className="font-bold text-brand-navy text-lg">Campaign Data</h2>
-                <p className="text-slate-500 text-sm mt-0.5">
-                  Demo data pre-loaded — edit or paste your own JSON and hit Run Audit
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setJson(JSON.stringify(mockAuditPayload, null, 2))}
-                className="btn-outline text-sm px-4 py-2"
-              >
-                Reset Demo Data
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-6">
-              <textarea
-                value={json}
-                onChange={(e) => setJson(e.target.value)}
-                className="w-full h-72 bg-slate-50 border border-slate-200 rounded-xl p-4 font-mono text-xs text-brand-navy placeholder-slate-400 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 resize-none"
-                spellCheck={false}
-              />
-
-              {error && (
-                <p className="mt-3 text-sm text-red-500 bg-red-50 border border-red-200 px-4 py-2.5 rounded-lg">
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary w-full mt-5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
-              >
-                {loading ? (
-                  <>
-                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                    Running Audit…
-                  </>
-                ) : "Run Audit →"}
-              </button>
-            </form>
+          {/* ── Platform cards ── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-slide-up">
+            <PlatformCard
+              icon={<MetaIcon />}
+              name="Meta Ads"
+              desc="Campaigns · Creatives · Audiences · Funnel"
+              color="blue"
+            />
+            <PlatformCard
+              icon={<GoogleIcon />}
+              name="Google Ads"
+              desc="Search · Shopping · ROAS · Wasted Spend"
+              color="orange"
+            />
+            <PlatformCard
+              icon={<CompIcon />}
+              name="Competitors"
+              desc="Ad Library · Winning Creatives · Gaps"
+              color="purple"
+            />
           </div>
 
-          {/* Feature pills */}
-          <div className="flex flex-wrap justify-center gap-3 mt-8">
-            {["Full Funnel Analysis", "Wasted Spend Detection", "Competitor Gap Analysis", "AI Prioritised Fixes", "Cross-Platform Insights"].map((f) => (
-              <span key={f} className="px-3 py-1.5 rounded-full bg-brand-navy/5 border border-brand-navy/10 text-slate-500 text-xs font-medium">
-                {f}
-              </span>
+          {/* ── CTA ── */}
+          <div className="flex flex-col items-center gap-4 animate-slide-up">
+            <button
+              onClick={runAudit}
+              disabled={loading}
+              className="btn-primary text-lg px-12 py-4 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-3"
+            >
+              {loading ? (
+                <>
+                  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                  </svg>
+                  Analysing campaigns…
+                </>
+              ) : (
+                <>
+                  Run Full Funnel Audit
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                  </svg>
+                </>
+              )}
+            </button>
+
+            {error && (
+              <p className="text-sm text-red-500 bg-red-50 border border-red-200 px-4 py-2.5 rounded-lg">{error}</p>
+            )}
+
+            <p className="text-brand-muted text-sm">
+              Running on demo data · Connect your accounts for live analysis
+            </p>
+          </div>
+
+          {/* ── What you get ── */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16">
+            {[
+              { icon: "📊", label: "Funnel Health Score",   sub: "0–100 across 4 dimensions" },
+              { icon: "💸", label: "Wasted Spend Detected", sub: "AED value, per campaign"   },
+              { icon: "🎯", label: "Competitor Gaps",       sub: "Creatives, formats, hooks" },
+              { icon: "⚡", label: "Prioritised Fixes",     sub: "Sorted by business impact" },
+            ].map((f) => (
+              <div key={f.label} className="card p-4 text-center">
+                <div className="text-2xl mb-2">{f.icon}</div>
+                <p className="text-sm font-semibold text-brand-text">{f.label}</p>
+                <p className="text-xs text-brand-muted mt-1">{f.sub}</p>
+              </div>
             ))}
           </div>
         </main>
       </div>
     </>
+  );
+}
+
+function PlatformCard({ icon, name, desc, color }) {
+  const ring = {
+    blue:   "border-blue-200   bg-blue-50",
+    orange: "border-orange-200 bg-orange-50",
+    purple: "border-purple-200 bg-brand-lavender",
+  }[color];
+
+  return (
+    <div className={`card p-5 flex items-start gap-4`}>
+      <div className={`w-11 h-11 rounded-xl border flex items-center justify-center flex-shrink-0 ${ring}`}>
+        {icon}
+      </div>
+      <div>
+        <p className="font-semibold text-brand-text text-sm">{name}</p>
+        <p className="text-brand-muted text-xs mt-0.5 leading-relaxed">{desc}</p>
+      </div>
+    </div>
+  );
+}
+
+function MetaIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="#1877F2">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+  );
+}
+
+function CompIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
   );
 }
