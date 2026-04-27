@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --color-navy:   #0F172A;
+  --color-green:  #22C55E;
+  --color-blue:   #3B82F6;
+  --color-bg:     #F8FAFC;
+  --color-card:   #1E293B;
+  --color-muted:  #94A3B8;
+  --color-border: #334155;
+  --color-critical: #EF4444;
+  --color-high:     #F97316;
+  --color-medium:   #EAB308;
+  --color-low:      #94A3B8;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background-color: var(--color-bg);
+  color: var(--color-navy);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Severity badge utilities */
+@layer components {
+  .badge-critical { @apply bg-red-500/15 text-red-400 border border-red-500/30; }
+  .badge-high     { @apply bg-orange-500/15 text-orange-400 border border-orange-500/30; }
+  .badge-medium   { @apply bg-yellow-500/15 text-yellow-400 border border-yellow-500/30; }
+  .badge-low      { @apply bg-slate-500/15 text-slate-400 border border-slate-500/30; }
+
+  .card-dark {
+    @apply bg-brand-card rounded-2xl border border-brand-border shadow-card;
+  }
+
+  .btn-primary {
+    @apply bg-brand-green text-brand-navy font-semibold px-6 py-3 rounded-xl
+           hover:brightness-110 transition-all duration-200 shadow-glow;
+  }
+
+  .btn-secondary {
+    @apply bg-brand-blue text-white font-semibold px-6 py-3 rounded-xl
+           hover:brightness-110 transition-all duration-200 shadow-glow-blue;
+  }
+
+  .btn-outline {
+    @apply border border-brand-border text-brand-muted font-medium px-6 py-3 rounded-xl
+           hover:border-brand-green hover:text-brand-green transition-all duration-200;
+  }
+
+  .metric-value {
+    @apply text-3xl font-extrabold text-white tracking-tight;
+  }
+
+  .metric-label {
+    @apply text-xs font-medium text-brand-muted uppercase tracking-widest;
+  }
+
+  .section-title {
+    @apply text-sm font-semibold text-brand-muted uppercase tracking-widest mb-4;
+  }
+}
+
+/* Score ring animation */
+.score-ring-track { stroke: #334155; }
+.score-ring-fill  { transition: stroke-dashoffset 1s ease-in-out; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-card); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
