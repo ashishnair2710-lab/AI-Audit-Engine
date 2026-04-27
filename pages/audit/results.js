@@ -3,10 +3,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import Navbar from "../../components/Navbar";
 import ScoreRing from "../../components/ScoreRing";
-import IssueCard from "../../components/IssueCard";
-import MetricBar, { MetricTile } from "../../components/MetricBar";
-import TabPanel from "../../components/TabPanel";
-import InsightCard from "../../components/InsightCard";
+import MetricBar from "../../components/MetricBar";
 import FunnelViz from "../../components/FunnelViz";
 import DonutChart from "../../components/DonutChart";
 import CompetitorBar from "../../components/CompetitorBar";
@@ -33,7 +30,7 @@ export default function ResultsPage() {
     <div className="min-h-screen bg-brand-bg flex items-center justify-center">
       <div className="text-center space-y-3">
         <div className="w-10 h-10 border-2 border-brand-purple border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-brand-muted text-sm">Analysing your campaigns…</p>
+        <p className="text-brand-muted text-sm">Analysing…</p>
       </div>
     </div>
   );
@@ -48,62 +45,62 @@ export default function ResultsPage() {
   const score      = data.funnel_health_score || 0;
   const ringColor  = score >= 70 ? "purple" : score >= 45 ? "orange" : "red";
 
+  const totalSpend = google.summary?.total_spend || 0;
+  const wasted     = google.summary?.wasted_spend || 0;
+  const efficient  = Math.round(((totalSpend - wasted) / Math.max(totalSpend, 1)) * 100);
+
   const donutSegments = [
-    { label: "TOFU – Awareness",  value: bp.tofu_pct || 0, color: "#7C3AED" },
-    { label: "MOFU – Traffic",    value: bp.mofu_pct || 0, color: "#3B82F6" },
-    { label: "BOFU – Conversion", value: bp.bofu_pct || 0, color: "#0F172A" },
+    { label: "Awareness",  value: bp.tofu_pct || 0, color: "#7C3AED" },
+    { label: "Traffic",    value: bp.mofu_pct || 0, color: "#3B82F6" },
+    { label: "Conversion", value: bp.bofu_pct || 0, color: "#0F172A" },
   ];
+
+  const topFixes = (data.top_fixes || []).slice(0, 4);
 
   return (
     <>
-      <Head><title>Audit Results — {score}/100</title></Head>
+      <Head><title>Audit · {score}/100</title></Head>
       <div className="min-h-screen bg-brand-bg">
         <Navbar />
 
         <main className="pt-20 pb-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-5">
 
-          {/* ── HERO BANNER ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 pt-4">
+          {/* ── HEADER STRIP ── */}
+          <div className="pt-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-brand-purple uppercase tracking-widest">AI Audit Report</p>
+              <h1 className="text-2xl font-bold text-brand-navy">Funnel Health Overview</h1>
+            </div>
+            <span className="text-xs text-brand-muted bg-white border border-brand-border px-3 py-1.5 rounded-full">
+              {new Date().toLocaleDateString("en-AE", { day: "numeric", month: "short", year: "numeric" })}
+            </span>
+          </div>
 
-            {/* Score */}
-            <div className="card p-6 flex flex-col items-center justify-center gap-2">
+          {/* ── HERO ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+
+            <div className="card p-6 flex flex-col items-center justify-center">
               <ScoreRing score={score} label={data.score_label} color={ringColor} grade={data.score_grade} />
-              <p className="text-xs text-brand-muted uppercase tracking-widest mt-1">Funnel Health Score</p>
+              <p className="text-xs text-brand-muted uppercase tracking-widest mt-3">Health Score</p>
             </div>
 
-            {/* Wasted spend callout */}
-            <div className="card p-6 border-l-4 border-red-400 flex flex-col justify-between">
-              <div>
-                <p className="text-xs font-semibold text-red-500 uppercase tracking-widest mb-1">⚠ Wasted Spend</p>
-                <p className="text-4xl font-extrabold text-red-500 leading-none">
-                  AED {fmt(kpis.wasted_spend)}
-                </p>
-                <p className="text-sm text-brand-muted mt-1">per month on Google</p>
-              </div>
-              <div className="mt-4 pt-4 border-t border-brand-border">
-                <p className="text-xs text-brand-muted">Across <span className="font-bold text-brand-text">{google.summary?.wasted_campaigns || 0} campaign(s)</span> with ROAS &lt; 1</p>
-              </div>
-            </div>
+            <StatCard
+              tone="red"
+              label="Wasted / month"
+              value={`AED ${fmt(kpis.wasted_spend)}`}
+              footer={`${google.summary?.wasted_campaigns || 0} campaigns · ROAS < 1`}
+            />
 
-            {/* Issues summary */}
-            <div className="card p-6 flex flex-col justify-between">
-              <div>
-                <p className="text-xs font-semibold text-brand-muted uppercase tracking-widest mb-3">Issues Breakdown</p>
-                <div className="space-y-2">
-                  <IssueLine color="bg-red-500"    label="Critical" count={kpis.critical_issues || 0} />
-                  <IssueLine color="bg-orange-500" label="High"     count={kpis.high_issues     || 0} />
-                  <IssueLine color="bg-yellow-400" label="Total"    count={kpis.total_issues    || 0} />
-                </div>
-              </div>
-              <div className="mt-4 pt-4 border-t border-brand-border">
-                <p className="text-xs text-brand-muted">Total spend: <span className="font-bold text-brand-text">AED {fmt(kpis.total_spend)}</span></p>
-              </div>
-            </div>
+            <StatCard
+              tone="purple"
+              label="Total Spend"
+              value={`AED ${fmt(kpis.total_spend)}`}
+              footer={`${efficient}% efficient`}
+            />
 
-            {/* Score breakdown */}
             <div className="card p-6">
-              <p className="section-title">Score Breakdown</p>
-              <div className="space-y-3">
+              <p className="text-xs font-semibold text-brand-muted uppercase tracking-widest mb-3">Score Breakdown</p>
+              <div className="space-y-2.5">
                 {Object.entries(data.score_breakdown || {}).map(([dim, val]) => (
                   <MetricBar
                     key={dim}
@@ -117,179 +114,130 @@ export default function ResultsPage() {
             </div>
           </div>
 
-          {/* ── AI SUMMARY ── */}
-          <div className="card p-6 border-l-4 border-brand-purple">
-            <div className="flex items-start gap-4">
-              <div className="w-9 h-9 rounded-xl bg-brand-lavender flex items-center justify-center flex-shrink-0">
-                <svg className="w-4 h-4 text-brand-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-              </div>
-              <div>
-                <p className="text-xs font-bold text-brand-purple uppercase tracking-widest mb-1">AI Decision Summary</p>
-                <p className="text-brand-subtext text-sm leading-relaxed">{data.summary}</p>
-              </div>
+          {/* ── ISSUE PULSE ── */}
+          <div className="card p-5">
+            <div className="grid grid-cols-3 gap-4">
+              <PulseStat color="bg-red-500"    label="Critical" count={kpis.critical_issues || 0} />
+              <PulseStat color="bg-orange-500" label="High"     count={kpis.high_issues     || 0} />
+              <PulseStat color="bg-yellow-400" label="Total"    count={kpis.total_issues    || 0} />
             </div>
           </div>
 
-          {/* ── TOP FIXES ── */}
+          {/* ── TOP FIXES (compact) ── */}
           <section>
-            <SectionHeader title="Top Priority Fixes" badge={`${data.top_fixes?.length || 0} actions`} />
+            <SectionHeader title="Fix First" badge={`${topFixes.length} actions`} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {(data.top_fixes || []).map((fix, i) => (
-                <IssueCard key={i} severity={fix.severity} title={fix.title} impact={fix.impact} action={fix.action} index={i} />
+              {topFixes.map((fix, i) => (
+                <FixRow key={i} index={i+1} severity={fix.severity} title={fix.title} impact={fix.impact} />
               ))}
             </div>
           </section>
 
-          {/* ── VISUAL PLATFORM ANALYSIS ── */}
+          {/* ── PLATFORM ── */}
           <section>
-            <SectionHeader title="Platform Analysis" />
+            <SectionHeader title="Platform Performance" />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-              {/* Meta — Funnel visual */}
               <div className="card p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center">
-                    <span className="text-xs font-bold text-blue-600">f</span>
-                  </div>
-                  <p className="font-semibold text-brand-text text-sm">Meta Ads — Funnel</p>
-                </div>
+                <ChartTitle dot="#3B82F6" text="Meta · Funnel" />
                 <FunnelViz
                   tofu={fp.tofu} mofu={fp.mofu} bofu={fp.bofu}
                   tofuPct={bp.tofu_pct||0} mofuPct={bp.mofu_pct||0} bofuPct={bp.bofu_pct||0}
                   tofuSpend={bp.tofu_spend||0} mofuSpend={bp.mofu_spend||0} bofuSpend={bp.bofu_spend||0}
                 />
-                {/* Signal badges */}
-                <div className="flex gap-2 mt-4 pt-4 border-t border-brand-border">
+                <div className="grid grid-cols-4 gap-1.5 mt-4 pt-4 border-t border-brand-border">
                   <SignalBadge label="Pixel" active={meta.signal_quality?.pixel_active} />
                   <SignalBadge label="CAPI"  active={meta.signal_quality?.capi_enabled} />
                   <SignalBadge label="Video" active={meta.creative_system?.has_video}    />
-                  <SignalBadge label="Retargeting" active={(meta.audience_mix?.retargeting||0) > 0} />
+                  <SignalBadge label="Retgt" active={(meta.audience_mix?.retargeting||0) > 0} />
                 </div>
               </div>
 
-              {/* Meta — Budget donut */}
               <div className="card p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-lg bg-purple-50 border border-purple-200 flex items-center justify-center">
-                    <svg className="w-3.5 h-3.5 text-brand-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
-                    </svg>
-                  </div>
-                  <p className="font-semibold text-brand-text text-sm">Meta Budget Split</p>
-                </div>
+                <ChartTitle dot="#7C3AED" text="Budget Split" />
                 <DonutChart segments={donutSegments} />
-                <div className="mt-4 pt-4 border-t border-brand-border">
-                  <p className="text-xs text-brand-muted">Total Meta spend: <span className="font-bold text-brand-text">AED {fmt(bp.total_spend)}</span></p>
+                <div className="mt-4 pt-4 border-t border-brand-border text-xs text-brand-muted">
+                  Meta spend · <span className="font-bold text-brand-text">AED {fmt(bp.total_spend)}</span>
                 </div>
               </div>
 
-              {/* Google — ROAS + Wasted */}
               <div className="card p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center">
-                    <span className="text-xs font-bold text-orange-600">G</span>
-                  </div>
-                  <p className="font-semibold text-brand-text text-sm">Google Ads Performance</p>
+                <ChartTitle dot="#F97316" text="Google · Efficiency" />
+
+                <div className="grid grid-cols-2 gap-3 mb-5">
+                  <KpiTile
+                    label="ROAS"
+                    value={`${google.summary?.avg_roas || 0}x`}
+                    tone={(google.summary?.avg_roas||0) >= 3 ? "purple" : "orange"}
+                  />
+                  <KpiTile
+                    label="Wasted"
+                    value={`AED ${fmt(wasted)}`}
+                    tone="red"
+                  />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-slate-50 rounded-xl p-3 text-center">
-                    <p className="text-xs text-brand-muted mb-1">Avg ROAS</p>
-                    <p className={`text-2xl font-extrabold ${(google.summary?.avg_roas||0) >= 3 ? "text-brand-purple" : "text-orange-500"}`}>
-                      {google.summary?.avg_roas || 0}x
-                    </p>
-                  </div>
-                  <div className="bg-red-50 rounded-xl p-3 text-center">
-                    <p className="text-xs text-red-400 mb-1">Wasted</p>
-                    <p className="text-xl font-extrabold text-red-500">AED {fmt(google.summary?.wasted_spend)}</p>
-                  </div>
-                </div>
-
-                {/* Efficiency bar */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-brand-muted mb-1">
-                    <span>Spend efficiency</span>
-                    <span>{Math.round(((google.summary?.total_spend||0) - (google.summary?.wasted_spend||0)) / Math.max(google.summary?.total_spend||1, 1) * 100)}% efficient</span>
-                  </div>
-                  <div className="h-3 bg-red-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-brand-purple rounded-full"
-                      style={{ width: `${Math.round(((google.summary?.total_spend||0) - (google.summary?.wasted_spend||0)) / Math.max(google.summary?.total_spend||1, 1) * 100)}%` }}
-                    />
-                  </div>
+                <div className="space-y-1.5">
                   <div className="flex justify-between text-xs">
-                    <span className="text-brand-purple font-medium">Effective</span>
-                    <span className="text-red-400 font-medium">Wasted</span>
+                    <span className="text-brand-purple font-semibold">{efficient}% Effective</span>
+                    <span className="text-red-400 font-semibold">{100-efficient}% Wasted</span>
+                  </div>
+                  <div className="h-2.5 bg-red-100 rounded-full overflow-hidden flex">
+                    <div className="h-full bg-brand-purple" style={{ width: `${efficient}%` }} />
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* ── COMPETITOR LANDSCAPE ── */}
+          {/* ── COMPETITORS ── */}
           {competitor.competitors?.length > 0 && (
             <section>
-              <SectionHeader title="Competitor Creative Landscape" badge={`${competitor.benchmarks?.competitors_analyzed} competitors`} />
+              <SectionHeader title="Competitors" badge={`${competitor.benchmarks?.competitors_analyzed} brands`} />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="card p-5">
-                  <p className="section-title">Creative Volume Comparison</p>
+                  <ChartTitle dot="#7C3AED" text="Creative Volume" />
                   <CompetitorBar
                     competitors={competitor.competitors}
                     userCount={competitor.benchmarks?.user_creative_count || 0}
                   />
                 </div>
                 <div className="card p-5">
-                  <p className="section-title">Winning Ads Detected</p>
+                  <ChartTitle dot="#F97316" text="Winning Ads" />
                   {competitor.winning_ads?.length > 0 ? (
-                    <div className="space-y-3">
-                      {competitor.winning_ads.map((ad, i) => (
-                        <div key={i} className="rounded-xl border border-purple-200 bg-purple-50 p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">🏆</span>
-                              <span className="font-bold text-brand-text text-sm">{ad.brand}</span>
+                    <div className="space-y-2.5">
+                      {competitor.winning_ads.slice(0,3).map((ad, i) => (
+                        <div key={i} className="rounded-lg border border-purple-200 bg-purple-50 p-3 flex items-center justify-between">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span>🏆</span>
+                            <span className="font-bold text-brand-text text-sm truncate">{ad.brand}</span>
+                            <div className="flex gap-1 flex-wrap">
+                              {(ad.hooks||[]).slice(0,2).map((h,j) => (
+                                <span key={j} className="text-[10px] bg-white border border-purple-200 text-brand-subtext px-1.5 py-0.5 rounded">{h}</span>
+                              ))}
                             </div>
-                            <span className="text-xs font-bold text-brand-purple bg-white border border-purple-200 px-2.5 py-1 rounded-full">
-                              {ad.duration_days} days live
-                            </span>
                           </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {(ad.hooks||[]).map((h,j) => (
-                              <span key={j} className="text-xs bg-white border border-purple-200 text-brand-subtext px-2 py-0.5 rounded">{h}</span>
-                            ))}
-                          </div>
+                          <span className="text-xs font-bold text-brand-purple bg-white border border-purple-200 px-2 py-0.5 rounded-full whitespace-nowrap">
+                            {ad.duration_days}d
+                          </span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-brand-muted text-sm">No winning ads detected yet.</p>
+                    <p className="text-brand-muted text-sm">No winning ads detected.</p>
                   )}
                 </div>
               </div>
             </section>
           )}
 
-          {/* ── CROSS-PLATFORM INSIGHTS ── */}
+          {/* ── INSIGHTS (compact rows) ── */}
           {cross.length > 0 && (
             <section>
-              <SectionHeader title="Cross-Platform Insights" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {cross.map((c, i) => (
-                  <InsightCard key={i} type="cross" title={c.title} detail={c.detail} impact={c.impact} fix={c.fix} index={i} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ── GROWTH OPPORTUNITIES ── */}
-          {data.growth_opportunities?.length > 0 && (
-            <section>
-              <SectionHeader title="Growth Opportunities" />
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {data.growth_opportunities.map((opp, i) => (
-                  <InsightCard key={i} type="growth" title={opp.title} detail={opp.detail} impact={opp.impact} effort={opp.effort} timeline={opp.timeline} index={i} />
+              <SectionHeader title="AI Insights" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {cross.slice(0,4).map((c, i) => (
+                  <InsightRow key={i} title={c.title} fix={c.fix} />
                 ))}
               </div>
             </section>
@@ -315,20 +263,70 @@ export default function ResultsPage() {
   );
 }
 
-// ── Small helpers ────────────────────────────────────────────────────────────
+// ── helpers ──────────────────────────────────────────────────────────────────
 
 function SectionHeader({ title, badge }) {
   return (
-    <div className="flex items-center justify-between mb-4">
-      <h2 className="text-xl font-bold text-brand-navy">{title}</h2>
-      {badge && <span className="text-xs text-brand-muted bg-white border border-brand-border px-3 py-1 rounded-full">{badge}</span>}
+    <div className="flex items-center justify-between mb-3">
+      <h2 className="text-lg font-bold text-brand-navy">{title}</h2>
+      {badge && <span className="text-xs text-brand-muted bg-white border border-brand-border px-2.5 py-1 rounded-full">{badge}</span>}
+    </div>
+  );
+}
+
+function ChartTitle({ dot, text }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <span className="w-2 h-2 rounded-full" style={{ background: dot }} />
+      <p className="font-semibold text-brand-text text-sm">{text}</p>
+    </div>
+  );
+}
+
+function StatCard({ tone, label, value, footer }) {
+  const tones = {
+    red:    { border: "border-red-400",    text: "text-red-500" },
+    purple: { border: "border-brand-purple", text: "text-brand-purple" },
+  };
+  const t = tones[tone] || tones.purple;
+  return (
+    <div className={`card p-6 border-l-4 ${t.border} flex flex-col justify-between`}>
+      <div>
+        <p className="text-xs font-semibold text-brand-muted uppercase tracking-widest mb-1">{label}</p>
+        <p className={`text-3xl font-extrabold leading-none ${t.text}`}>{value}</p>
+      </div>
+      <p className="text-xs text-brand-muted mt-3 pt-3 border-t border-brand-border">{footer}</p>
+    </div>
+  );
+}
+
+function KpiTile({ label, value, tone }) {
+  const tones = {
+    purple: "bg-purple-50 text-brand-purple",
+    orange: "bg-orange-50 text-orange-500",
+    red:    "bg-red-50 text-red-500",
+  };
+  return (
+    <div className={`rounded-xl p-3 text-center ${tones[tone]}`}>
+      <p className="text-[10px] uppercase tracking-widest font-semibold opacity-70 mb-0.5">{label}</p>
+      <p className="text-xl font-extrabold leading-tight">{value}</p>
+    </div>
+  );
+}
+
+function PulseStat({ color, label, count }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${color}`} />
+      <span className="text-sm text-brand-muted flex-1">{label}</span>
+      <span className="text-2xl font-extrabold text-brand-text">{count}</span>
     </div>
   );
 }
 
 function SignalBadge({ label, active }) {
   return (
-    <span className={`flex-1 text-center text-xs font-semibold px-1.5 py-1 rounded-lg border ${
+    <span className={`text-center text-[10px] font-semibold px-1 py-1 rounded-md border ${
       active ? "bg-purple-50 text-brand-purple border-purple-200" : "bg-red-50 text-red-500 border-red-200"
     }`}>
       {active ? "✓" : "✗"} {label}
@@ -336,12 +334,27 @@ function SignalBadge({ label, active }) {
   );
 }
 
-function IssueLine({ color, label, count }) {
+function FixRow({ index, severity, title, impact }) {
+  const sev = (severity || "").toLowerCase();
+  const tone = sev === "critical" ? "bg-red-500" : sev === "high" ? "bg-orange-500" : "bg-yellow-400";
   return (
-    <div className="flex items-center gap-3">
-      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${color}`} />
-      <span className="text-sm text-brand-muted flex-1">{label}</span>
-      <span className="text-lg font-extrabold text-brand-text">{count}</span>
+    <div className="card p-4 flex items-start gap-3 hover:shadow-lifted transition-all">
+      <div className={`w-8 h-8 rounded-lg ${tone} text-white flex items-center justify-center font-bold text-sm flex-shrink-0`}>
+        {index}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-brand-text text-sm truncate">{title}</p>
+        {impact && <p className="text-xs text-brand-muted mt-0.5 line-clamp-2">{impact}</p>}
+      </div>
+    </div>
+  );
+}
+
+function InsightRow({ title, fix }) {
+  return (
+    <div className="card p-4 border-l-4 border-brand-purple">
+      <p className="font-semibold text-brand-text text-sm">{title}</p>
+      {fix && <p className="text-xs text-brand-muted mt-1 line-clamp-2">{fix}</p>}
     </div>
   );
 }
