@@ -22,7 +22,11 @@ export default function HomePage() {
       const res  = await fetch("/api/audit", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(mockAuditPayload),
+        body:    JSON.stringify({
+          ...mockAuditPayload,
+          competitor_brands: ["Nike", "Adidas", "Puma"],
+          country: "AE",
+        }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Audit failed."); setLoading(false); return; }

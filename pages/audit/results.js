@@ -392,12 +392,29 @@ function CompetitorsTab({ competitor }) {
 
       {/* COMPETITOR AD PREVIEWS */}
       <section>
-        <SectionHeader title="Competitor Ad Previews" badge="Loading" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {(competitor.competitors || []).slice(0,4).map((c, i) => (
-            <AdPreviewSkeleton key={i} platform="competitor" brand={c.brand} />
-          ))}
-        </div>
+        {(() => {
+          const realAds = (competitor.competitors || []).flatMap((c) => (c.ads || []).map((a) => ({...a, brand: c.brand})));
+          if (realAds.length > 0) {
+            return (
+              <>
+                <SectionHeader title="Competitor Ad Previews" badge={`${realAds.length} live`} />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {realAds.slice(0, 8).map((ad, i) => <AdPreviewLive key={i} ad={ad} />)}
+                </div>
+              </>
+            );
+          }
+          return (
+            <>
+              <SectionHeader title="Competitor Ad Previews" badge="Loading" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {(competitor.competitors || []).slice(0,4).map((c, i) => (
+                  <AdPreviewSkeleton key={i} platform="competitor" brand={c.brand} />
+                ))}
+              </div>
+            </>
+          );
+        })()}
       </section>
 
       {issues.length > 0 && (
@@ -531,6 +548,41 @@ function InsightRow({ title, fix }) {
       <p className="font-semibold text-brand-text text-sm">{title}</p>
       {fix && <p className="text-xs text-brand-muted mt-1 line-clamp-2">{fix}</p>}
     </div>
+  );
+}
+
+// ── LIVE AD PREVIEW (Meta Ad Library) ────────────────────────────────────────
+function AdPreviewLive({ ad }) {
+  const initial = (ad.brand || ad.page_name || "?")[0]?.toUpperCase();
+  return (
+    <a
+      href={ad.snapshot_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="card p-3 overflow-hidden hover:shadow-lifted transition-all block"
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-6 h-6 rounded-full bg-brand-lavender flex items-center justify-center text-[10px] font-bold text-brand-purple">
+          {initial}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold text-brand-text truncate">{ad.page_name || ad.brand}</p>
+          <p className="text-[10px] text-brand-muted">Sponsored</p>
+        </div>
+      </div>
+      <div className="aspect-square bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg flex items-center justify-center text-center p-3">
+        <p className="text-xs text-brand-purple font-medium line-clamp-4">
+          {ad.title || ad.body?.slice(0, 80) || "Ad creative"}
+        </p>
+      </div>
+      {ad.body && (
+        <p className="text-[11px] text-brand-subtext mt-2 line-clamp-2">{ad.body}</p>
+      )}
+      <div className="mt-2 pt-2 border-t border-brand-border flex items-center justify-between">
+        <span className="text-[10px] font-semibold text-brand-muted uppercase tracking-wider">{ad.brand}</span>
+        <span className="text-[10px] text-brand-purple font-semibold">View →</span>
+      </div>
+    </a>
   );
 }
 
