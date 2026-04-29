@@ -1,4 +1,4 @@
-import { searchBrands } from "../../lib/adAccounts/metaLibraryClient";
+import { searchBrand } from "../../lib/adAccounts/metaLibraryClient";
 
 /**
  * POST /api/competitors
@@ -24,7 +24,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const results = await searchBrands(brands, { country, limit });
+    // Don't filter errors — we want to see them for debugging
+    const results = await Promise.all(brands.map((b) => searchBrand(b, { country, limit })));
     return res.status(200).json({ success: true, competitors: results });
   } catch (err) {
     return res.status(500).json({ error: err.message });
