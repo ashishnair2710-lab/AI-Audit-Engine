@@ -7,6 +7,7 @@ import { generateReport }         from "../../lib/analyzers/generateReport";
 import { fetchMetaData }          from "../../lib/adAccounts/metaClient";
 import { fetchGoogleData }        from "../../lib/adAccounts/googleClient";
 import { searchBrands }           from "../../lib/adAccounts/metaLibraryClient";
+import { searchBrandsApify }      from "../../lib/adAccounts/apifyAdLibrary";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -16,10 +17,18 @@ export default async function handler(req, res) {
   try {
     let { meta_data, google_data, competitor_data, competitor_brands, use_live_data } = req.body;
 
-    // ── Live competitor data: pull from Meta Ad Library ───────────────────
-    if (Array.isArray(competitor_brands) && competitor_brands.length > 0 && process.env.META_LIBRARY_TOKEN) {
-      const live = await searchBrands(competitor_brands, { country: req.body.country || "AE" });
-      if (live?.length) competitor_data = live;
+    // ── Live competitor data: try Apify first, fall back to Meta API ──────
+    if (Array.isArray(competitor_brands) && competitor_brands.length > 0) {
+      const country = req.body.country || "AE";
+
+      if (process.env.APIFY_TOKEN) {
+        const live = await searchBrandsApify(competitor_brands, { country });
+        const usable = live.filter((r) => !r.error && r.ad_count > 0);
+        if (usable.length) competitor_data = usable;
+      } else if (process.env.META_LIBRARY_TOKEN) {
+        const live = await searchBrands(competitor_brands, { country });
+        if (live?.length) competitor_data = live;
+      }
     }
 
     // ── Live data mode: pull from connected ad accounts ───────────────────
