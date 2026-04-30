@@ -236,11 +236,22 @@ function MetaTab({ meta }) {
         </div>
       </div>
 
-      {/* AD PREVIEWS */}
+      {/* TOP / UNDERPERFORMING CREATIVES */}
       <section>
-        <SectionHeader title="Ad Previews" badge="Loading" />
+        <SectionHeader title="Top Performing Creatives" badge={`${(meta.top_creatives||[]).length}`} />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {Array.from({length: 4}).map((_, i) => <AdPreviewSkeleton key={i} platform="meta" />)}
+          {(meta.top_creatives || []).length > 0
+            ? meta.top_creatives.map((ad, i) => <CreativeCard key={i} ad={ad} tone="top" platform="meta" />)
+            : Array.from({length: 4}).map((_, i) => <AdPreviewSkeleton key={i} platform="meta" />)}
+        </div>
+      </section>
+
+      <section>
+        <SectionHeader title="Underperforming — Consider Killing" badge={`${(meta.underperforming_creatives||[]).length}`} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {(meta.underperforming_creatives || []).length > 0
+            ? meta.underperforming_creatives.map((ad, i) => <CreativeCard key={i} ad={ad} tone="bottom" platform="meta" />)
+            : Array.from({length: 4}).map((_, i) => <AdPreviewSkeleton key={i} platform="meta" />)}
         </div>
       </section>
 
@@ -318,11 +329,22 @@ function GoogleTab({ google }) {
         </div>
       </div>
 
-      {/* AD PREVIEWS */}
+      {/* TOP / WORST CAMPAIGNS */}
       <section>
-        <SectionHeader title="Search Ad Previews" badge="Loading" />
+        <SectionHeader title="Top Performing Campaigns" badge={`${(google.top_campaigns||[]).length}`} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {Array.from({length: 4}).map((_, i) => <SearchAdSkeleton key={i} />)}
+          {(google.top_campaigns || []).length > 0
+            ? google.top_campaigns.map((c, i) => <CreativeCard key={i} ad={c} tone="top" platform="google" />)
+            : Array.from({length: 4}).map((_, i) => <SearchAdSkeleton key={i} />)}
+        </div>
+      </section>
+
+      <section>
+        <SectionHeader title="Worst Campaigns — Consider Pausing" badge={`${(google.worst_campaigns||[]).length}`} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {(google.worst_campaigns || []).length > 0
+            ? google.worst_campaigns.map((c, i) => <CreativeCard key={i} ad={c} tone="bottom" platform="google" />)
+            : Array.from({length: 4}).map((_, i) => <SearchAdSkeleton key={i} />)}
         </div>
       </section>
 
@@ -547,6 +569,53 @@ function InsightRow({ title, fix }) {
     <div className="card p-4 border-l-4 border-brand-purple">
       <p className="font-semibold text-brand-text text-sm">{title}</p>
       {fix && <p className="text-xs text-brand-muted mt-1 line-clamp-2">{fix}</p>}
+    </div>
+  );
+}
+
+// ── CREATIVE / CAMPAIGN CARD (top + bottom performers) ──────────────────────
+function CreativeCard({ ad, tone, platform }) {
+  const isTop = tone === "top";
+  const accent = isTop
+    ? { ring: "border-emerald-200", bg: "bg-emerald-50",  text: "text-emerald-600", badge: "bg-emerald-500" }
+    : { ring: "border-red-200",     bg: "bg-red-50",      text: "text-red-500",     badge: "bg-red-500" };
+
+  const roas = ad.roas != null ? `${Number(ad.roas).toFixed(2)}x` : "—";
+  const cpa  = ad.cpa  != null ? `AED ${fmt(ad.cpa)}`             : "—";
+
+  return (
+    <div className={`card p-4 border-l-4 ${accent.ring} hover:shadow-lifted transition-all`}>
+      <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className={`text-[9px] font-bold text-white uppercase tracking-wider ${accent.badge} px-1.5 py-0.5 rounded`}>
+              {isTop ? "Winner" : "Killer"}
+            </span>
+            {platform === "google" && (
+              <span className="text-[9px] font-bold text-brand-muted bg-slate-100 px-1.5 py-0.5 rounded uppercase">{ad.type || "search"}</span>
+            )}
+            {platform === "meta" && ad.format && (
+              <span className="text-[9px] font-bold text-brand-muted bg-slate-100 px-1.5 py-0.5 rounded uppercase">{ad.format}</span>
+            )}
+          </div>
+          <p className="font-semibold text-brand-text text-sm truncate">{ad.name || ad.headline || "Untitled"}</p>
+        </div>
+      </div>
+
+      <div className={`grid grid-cols-3 gap-2 p-3 rounded-lg ${accent.bg}`}>
+        <div>
+          <p className="text-[9px] font-semibold text-brand-muted uppercase tracking-wider">Spend</p>
+          <p className="text-sm font-extrabold text-brand-text">AED {fmt(ad.spend)}</p>
+        </div>
+        <div>
+          <p className="text-[9px] font-semibold text-brand-muted uppercase tracking-wider">ROAS</p>
+          <p className={`text-sm font-extrabold ${accent.text}`}>{roas}</p>
+        </div>
+        <div>
+          <p className="text-[9px] font-semibold text-brand-muted uppercase tracking-wider">{platform === "meta" ? "Conv" : "CPA"}</p>
+          <p className="text-sm font-extrabold text-brand-text">{platform === "meta" ? fmt(ad.conversions) : cpa}</p>
+        </div>
+      </div>
     </div>
   );
 }
