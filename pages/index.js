@@ -38,7 +38,12 @@ export default function HomePage() {
         body:    JSON.stringify(body),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || "Audit failed."); setLoading(false); return; }
+      if (!res.ok) {
+        const detail = Array.isArray(data.details) && data.details.length ? ` — ${data.details.join("; ")}` : "";
+        setError((data.error || "Audit failed.") + detail);
+        setLoading(false);
+        return;
+      }
       sessionStorage.setItem("auditResult", JSON.stringify(data));
       router.push("/audit/results");
     } catch {

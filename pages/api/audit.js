@@ -33,28 +33,49 @@ export default async function handler(req, res) {
     }
 
     // ── Live data mode: pull from connected ad accounts ───────────────────
+    const liveErrors = [];
     if (use_live_data) {
       const metaToken   = req.cookies?.meta_access_token;
       const googleToken = req.cookies?.google_access_token;
 
+      if (!metaToken && !googleToken) {
+        return res.status(400).json({
+          error: "Live data requested but no accounts connected.",
+          hint:  "Go to /connect and authorise Meta or Google first.",
+        });
+      }
+
       if (metaToken) {
         const adAccountId = req.cookies?.meta_ad_account_id;
-        const liveMetaData = await fetchMetaData(metaToken, adAccountId, { days: lookbackDays });
-        if (liveMetaData && !liveMetaData.error) meta_data = liveMetaData;
+        if (!adAccountId) {
+          liveErrors.push("Meta: no ad account selected. Pick one on /connect.");
+        } else {
+          const liveMetaData = await fetchMetaData(metaToken, adAccountId, { days: lookbackDays });
+          if (liveMetaData?.error) liveErrors.push(`Meta: ${liveMetaData.error}`);
+          else if (liveMetaData)   meta_data = liveMetaData;
+        }
       }
 
       if (googleToken) {
         const customerId = req.cookies?.google_customer_id;
-        const liveGoogleData = await fetchGoogleData(googleToken, customerId, { days: lookbackDays });
-        if (liveGoogleData && !liveGoogleData.error) google_data = liveGoogleData;
+        if (!customerId) {
+          liveErrors.push("Google: no customer ID set.");
+        } else {
+          const liveGoogleData = await fetchGoogleData(googleToken, customerId, { days: lookbackDays });
+          if (liveGoogleData?.error) liveErrors.push(`Google: ${liveGoogleData.error}`);
+          else if (liveGoogleData)   google_data = liveGoogleData;
+        }
       }
     }
 
     // ── Validate minimum input ─────────────────────────────────────────────
     if (!meta_data && !google_data) {
       return res.status(400).json({
-        error: "At least one of meta_data or google_data is required.",
-        hint:  "POST a JSON body with meta_data and/or google_data fields, or set use_live_data: true with connected accounts.",
+        error: liveErrors.length ? "Live data fetch failed." : "At least one of meta_data or google_data is required.",
+        details: liveErrors,
+        hint:    liveErrors.length
+          ? "See details for the underlying API errors."
+          : "POST a JSON body with meta_data and/or google_data fields, or set use_live_data: true with connected accounts.",
       });
     }
 
