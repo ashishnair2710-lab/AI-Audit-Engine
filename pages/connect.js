@@ -3,9 +3,11 @@ import { useRouter }           from "next/router";
 import Head                    from "next/head";
 import Navbar                  from "../components/Navbar";
 
-export default function ConnectPage({ metaConnected, googleConnected, metaAccountName, googleAccountEmail }) {
+export default function ConnectPage({ metaConnected, googleConnected, metaAccountName, googleAccountEmail, metaAccountId }) {
   const router  = useRouter();
-  const [toast, setToast] = useState(null);
+  const [toast, setToast]       = useState(null);
+  const [accounts, setAccounts] = useState([]);
+  const [selected, setSelected] = useState(metaAccountId || "");
 
   useEffect(() => {
     const { success, error } = router.query;
@@ -13,6 +15,28 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
     if (success === "google") showToast("Google Ads connected successfully!", "success");
     if (error)                showToast(friendlyError(error), "error");
   }, [router.query]);
+
+  useEffect(() => {
+    if (!metaConnected) return;
+    fetch("/api/auth/meta/accounts")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.accounts)) setAccounts(d.accounts);
+        if (d.selected) setSelected(d.selected);
+      })
+      .catch(() => {});
+  }, [metaConnected]);
+
+  async function pickAccount(id) {
+    const acc = accounts.find((a) => a.id === id);
+    setSelected(id);
+    await fetch("/api/auth/meta/select-account", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ account_id: id, account_name: acc?.name || "" }),
+    });
+    showToast(`Selected ${acc?.name || id}`, "success");
+  }
 
   function showToast(msg, type) {
     setToast({ msg, type });
@@ -63,8 +87,31 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
               accountLabel={metaAccountName ? decodeURIComponent(metaAccountName) : null}
               connectHref="/api/auth/meta"
               onDisconnect={() => disconnect("meta")}
-              permissions={["ads_read", "ads_management", "business_management", "read_insights"]}
-            />
+              permissions={["ads_read", "ads_management", "business_management"]}
+            >
+              {metaConnected && accounts.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                  <label className="block text-xs font-semibold text-brand-muted uppercase tracking-widest mb-2">
+                    Select Ad Account
+                  </label>
+                  <select
+                    value={selected}
+                    onChange={(e) => pickAccount(e.target.value)}
+                    className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:border-brand-purple"
+                  >
+                    <option value="">— Choose an account —</option>
+                    {accounts.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name} {a.business ? `· ${a.business}` : ""} ({a.currency || "—"})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-brand-muted mt-1.5">
+                    {accounts.length} account{accounts.length === 1 ? "" : "s"} available
+                  </p>
+                </div>
+              )}
+            </PlatformCard>
 
             {/* Google */}
             <PlatformCard
@@ -108,7 +155,7 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
   );
 }
 
-function PlatformCard({ platform, description, icon, connected, accountLabel, connectHref, onDisconnect, permissions }) {
+function PlatformCard({ platform, description, icon, connected, accountLabel, connectHref, onDisconnect, permissions, children }) {
   return (
     <div className={`bg-white rounded-2xl border shadow-card p-6 transition-all duration-200 ${
       connected ? "border-brand-green/30" : "border-slate-200"
@@ -159,6 +206,8 @@ function PlatformCard({ platform, description, icon, connected, accountLabel, co
               Connect {platform} →
             </a>
           )}
+
+          {children}
         </div>
       </div>
     </div>
@@ -207,6 +256,7 @@ export async function getServerSideProps({ req }) {
       metaConnected:      cookies.includes("meta_connected=true"),
       googleConnected:    cookies.includes("google_connected=true"),
       metaAccountName:    get("meta_account_name")    || null,
+      metaAccountId:      get("meta_ad_account_id")   || null,
       googleAccountEmail: get("google_account_email") || null,
     },
   };

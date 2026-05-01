@@ -15,7 +15,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    let { meta_data, google_data, competitor_data, competitor_brands, use_live_data } = req.body;
+    let { meta_data, google_data, competitor_data, competitor_brands, use_live_data, days, client_name } = req.body;
+    const lookbackDays = Number(days) || 30;
 
     // ── Live competitor data: try Apify first, fall back to Meta API ──────
     if (Array.isArray(competitor_brands) && competitor_brands.length > 0) {
@@ -38,13 +39,13 @@ export default async function handler(req, res) {
 
       if (metaToken) {
         const adAccountId = req.cookies?.meta_ad_account_id;
-        const liveMetaData = await fetchMetaData(metaToken, adAccountId);
+        const liveMetaData = await fetchMetaData(metaToken, adAccountId, { days: lookbackDays });
         if (liveMetaData && !liveMetaData.error) meta_data = liveMetaData;
       }
 
       if (googleToken) {
         const customerId = req.cookies?.google_customer_id;
-        const liveGoogleData = await fetchGoogleData(googleToken, customerId);
+        const liveGoogleData = await fetchGoogleData(googleToken, customerId, { days: lookbackDays });
         if (liveGoogleData && !liveGoogleData.error) google_data = liveGoogleData;
       }
     }
@@ -68,6 +69,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       data_source: use_live_data ? "live" : "provided",
+      client_name: client_name || req.cookies?.meta_account_name || "Untitled Client",
+      lookback_days: lookbackDays,
       ...report,
     });
 

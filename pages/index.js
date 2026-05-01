@@ -9,24 +9,33 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState("");
   const [userName, setUserName] = useState("");
+  const [clientName, setClientName] = useState("");
+  const [days, setDays]         = useState(30);
+  const [useLive, setUseLive]   = useState(false);
+  const [conn, setConn]         = useState({ meta: false, google: false });
 
   useEffect(() => {
     if (!sessionStorage.getItem("auth")) { router.push("/login"); return; }
     setUserName(sessionStorage.getItem("user_name") || "");
+    const cookies = document.cookie;
+    const meta    = cookies.includes("meta_connected=true");
+    const google  = cookies.includes("google_connected=true");
+    setConn({ meta, google });
+    if (meta || google) setUseLive(true);
   }, []);
 
   async function runAudit() {
     setLoading(true);
     setError("");
     try {
+      const body = useLive
+        ? { use_live_data: true, days, client_name: clientName, competitor_brands: ["Nike", "Adidas", "Puma"], country: "AE" }
+        : { ...mockAuditPayload, days, client_name: clientName || "Demo Client", competitor_brands: ["Nike", "Adidas", "Puma"], country: "AE" };
+
       const res  = await fetch("/api/audit", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({
-          ...mockAuditPayload,
-          competitor_brands: ["Nike", "Adidas", "Puma"],
-          country: "AE",
-        }),
+        body:    JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Audit failed."); setLoading(false); return; }
@@ -68,6 +77,70 @@ export default function HomePage() {
             <PlatformCard icon={<MetaIcon />}   name="Meta Ads"    desc="Campaigns · Creatives · Audiences · Funnel" ring="border-blue-200 bg-blue-50" />
             <PlatformCard icon={<GoogleIcon />}  name="Google Ads"  desc="Search · Shopping · ROAS · Wasted Spend"   ring="border-orange-200 bg-orange-50" />
             <PlatformCard icon={<CompIcon />}    name="Competitors" desc="Ad Library · Winning Creatives · Gaps"     ring="border-purple-200 bg-brand-lavender" />
+          </div>
+
+          {/* AUDIT CONFIG */}
+          <div className="card p-6 mb-6 max-w-2xl mx-auto animate-slide-up">
+            <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-4">Audit Setup</h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5">Client Name</label>
+                <input
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  placeholder="e.g. Acme Corp"
+                  className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:border-brand-purple"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5">Date Range</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[7, 30, 60, 90].map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => setDays(d)}
+                      className={`py-2 text-sm font-semibold rounded-lg border transition-all ${
+                        days === d
+                          ? "bg-brand-purple text-white border-brand-purple"
+                          : "bg-white text-brand-muted border-slate-200 hover:border-brand-purple/40"
+                      }`}
+                    >
+                      Last {d}d
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-lg bg-brand-bg border border-brand-border">
+                <div>
+                  <p className="text-sm font-semibold text-brand-text">Use live data</p>
+                  <p className="text-[11px] text-brand-muted">
+                    {(conn.meta || conn.google)
+                      ? `Connected: ${[conn.meta && "Meta", conn.google && "Google"].filter(Boolean).join(" + ")}`
+                      : "No accounts connected — will use demo data"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setUseLive(!useLive)}
+                  disabled={!conn.meta && !conn.google}
+                  className={`relative w-11 h-6 rounded-full transition-all ${
+                    useLive && (conn.meta || conn.google) ? "bg-brand-purple" : "bg-slate-300"
+                  } disabled:opacity-40 disabled:cursor-not-allowed`}
+                >
+                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${
+                    useLive && (conn.meta || conn.google) ? "left-[22px]" : "left-0.5"
+                  }`} />
+                </button>
+              </div>
+
+              {!conn.meta && !conn.google && (
+                <a href="/connect" className="block text-center text-xs text-brand-purple font-semibold hover:underline">
+                  → Connect Meta or Google Ads to use live data
+                </a>
+              )}
+            </div>
           </div>
 
           {/* CTA */}
