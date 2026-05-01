@@ -10,7 +10,7 @@ export default function HomePage() {
   const [error,   setError]   = useState("");
   const [userName, setUserName] = useState("");
   const [clientName, setClientName] = useState("");
-  const [days, setDays]         = useState(30);
+  const [days, setDays]         = useState(30); // number or "lifetime"
   const [useLive, setUseLive]   = useState(false);
   const [conn, setConn]         = useState({ meta: false, google: false });
 
@@ -96,18 +96,24 @@ export default function HomePage() {
 
               <div>
                 <label className="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5">Date Range</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {[7, 30, 60, 90].map((d) => (
+                <div className="grid grid-cols-5 gap-2">
+                  {[
+                    { v: 7,          label: "Last 7d"   },
+                    { v: 30,         label: "Last 30d"  },
+                    { v: 60,         label: "Last 60d"  },
+                    { v: 90,         label: "Last 90d"  },
+                    { v: "lifetime", label: "Lifetime"  },
+                  ].map((opt) => (
                     <button
-                      key={d}
-                      onClick={() => setDays(d)}
+                      key={opt.v}
+                      onClick={() => setDays(opt.v)}
                       className={`py-2 text-sm font-semibold rounded-lg border transition-all ${
-                        days === d
+                        days === opt.v
                           ? "bg-brand-purple text-white border-brand-purple"
                           : "bg-white text-brand-muted border-slate-200 hover:border-brand-purple/40"
                       }`}
                     >
-                      Last {d}d
+                      {opt.label}
                     </button>
                   ))}
                 </div>

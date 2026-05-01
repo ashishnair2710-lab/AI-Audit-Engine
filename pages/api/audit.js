@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   try {
     let { meta_data, google_data, competitor_data, competitor_brands, use_live_data, days, client_name } = req.body;
-    const lookbackDays = Number(days) || 30;
+    const lookbackDays = days === "lifetime" ? "lifetime" : (Number(days) || 30);
 
     // ── Live competitor data: try Apify first, fall back to Meta API ──────
     if (Array.isArray(competitor_brands) && competitor_brands.length > 0) {
