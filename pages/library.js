@@ -95,8 +95,15 @@ export default function LibraryPage() {
           </form>
 
           {error && (
-            <div className="mb-5 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-600">
-              {error}
+            <div className="mb-5 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm space-y-1">
+              <p className="font-semibold text-red-600">{error}</p>
+              {(error.includes("No Ad Library") || error.includes("not configured")) && (
+                <p className="text-xs text-red-500">
+                  Connect your Meta account on{" "}
+                  <a href="/connect" className="underline font-semibold">Connect Accounts</a>
+                  {" "}— the Ads Library uses your existing Meta login automatically. No extra setup needed.
+                </p>
+              )}
             </div>
           )}
 

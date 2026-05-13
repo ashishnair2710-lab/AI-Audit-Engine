@@ -244,14 +244,21 @@ function CreativePanel({ title, subtitle, tone, creatives }) {
       ) : (
         <div className="space-y-3">
           {creatives.slice(0, 3).map((c, i) => (
-            <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-brand-bg border border-brand-border hover:shadow-sm transition-all">
-              <Thumbnail src={c.thumbnail} label={c.format} />
+            <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-brand-bg border border-brand-border hover:shadow-sm transition-all">
+              <Thumbnail src={c.thumbnail} format={c.format} previewUrl={c.preview_url} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-brand-text line-clamp-2 leading-snug">{c.label || c.name}</p>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-[10px] font-bold text-brand-muted uppercase tracking-wider">{c.format || "ad"}</span>
-                  {c.spend ? <span className="text-[10px] text-brand-muted">· AED {Number(c.spend).toLocaleString()}</span> : null}
+                <p className="text-sm font-semibold text-brand-text line-clamp-2 leading-snug">{c.label || c.name || "Untitled Ad"}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[10px] font-bold text-brand-muted uppercase tracking-wider bg-slate-100 px-1.5 py-0.5 rounded">{c.format || "ad"}</span>
+                  {c.spend > 0 ? <span className="text-[10px] text-brand-muted">AED {Math.round(c.spend).toLocaleString()} spent</span> : null}
+                  {c.impressions > 0 ? <span className="text-[10px] text-brand-muted">· {Number(c.impressions).toLocaleString()} impr</span> : null}
                 </div>
+                {c.preview_url && (
+                  <a href={c.preview_url} target="_blank" rel="noopener noreferrer"
+                    className="text-[10px] text-brand-purple font-semibold hover:underline mt-1 flex items-center gap-0.5">
+                    View ad preview ↗
+                  </a>
+                )}
               </div>
               <span className={`text-xs font-bold border px-2.5 py-1.5 rounded-lg ${accent.chip} whitespace-nowrap`}>
                 {Number(c.ctr || 0).toFixed(2)}% CTR
@@ -264,17 +271,29 @@ function CreativePanel({ title, subtitle, tone, creatives }) {
   );
 }
 
-function Thumbnail({ src, label }) {
-  if (src) {
-    return <img src={src} alt="" className="w-24 h-24 rounded-lg object-cover bg-slate-100 flex-shrink-0 ring-1 ring-slate-200" />;
-  }
-  return (
-    <div className="w-24 h-24 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center flex-shrink-0">
-      <svg className="w-8 h-8 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+function Thumbnail({ src, format, previewUrl }) {
+  const inner = src ? (
+    <img src={src} alt="" className="w-20 h-20 rounded-lg object-cover bg-slate-100 flex-shrink-0 ring-1 ring-slate-200" />
+  ) : (
+    <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 flex flex-col items-center justify-center flex-shrink-0 gap-1">
+      <svg className="w-6 h-6 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
       </svg>
+      <span className="text-[9px] text-purple-300 font-medium uppercase tracking-wide">{format || "ad"}</span>
     </div>
   );
+
+  if (previewUrl) {
+    return (
+      <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 group relative">
+        {inner}
+        <div className="absolute inset-0 rounded-lg bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <span className="text-white text-[9px] font-bold">Preview</span>
+        </div>
+      </a>
+    );
+  }
+  return <div className="flex-shrink-0">{inner}</div>;
 }
 
 function OverviewFlags({ meta, google }) {
