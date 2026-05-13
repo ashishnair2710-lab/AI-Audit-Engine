@@ -167,8 +167,8 @@ function PlatformMetrics({ platform, data }) {
   const isMeta   = platform === "meta";
   const currency = "AED";
 
-  const fmt  = (n) => n != null ? Number(n).toLocaleString() : "—";
-  const fmtC = (n) => n != null && n > 0 ? `${currency} ${Number(n).toLocaleString()}` : "—";
+  const fmt  = (n) => n != null ? Math.round(Number(n)).toLocaleString() : "—";
+  const fmtC = (n) => n != null && n > 0 ? `${currency} ${Math.round(Number(n)).toLocaleString()}` : "—";
   const fmtP = (n) => n != null ? `${Number(n).toFixed(2)}%` : "—";
   const fmtX = (n) => n != null && n > 0 ? `${Number(n).toFixed(2)}x` : "—";
 
@@ -355,7 +355,19 @@ function CompetitorPanel({ competitor }) {
   const insights    = competitor.insights    || [];
 
   if (!competitors.length) {
-    return <p className="text-xs text-brand-muted text-center py-8">No competitor data in this audit. Add competitor brands on the home screen.</p>;
+    return (
+      <div className="text-center py-8 px-4">
+        <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-purple-50 flex items-center justify-center">
+          <svg className="w-5 h-5 text-brand-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"/>
+          </svg>
+        </div>
+        <p className="text-sm font-bold text-brand-navy mb-1">No competitor data</p>
+        <p className="text-xs text-brand-muted max-w-xs mx-auto">
+          Add <code className="bg-slate-100 px-1 rounded">APIFY_TOKEN</code> in your Vercel environment variables, then re-run the audit to pull live competitor ads.
+        </p>
+      </div>
+    );
   }
 
   const userCount   = benchmarks.user_creative_count        || 0;
