@@ -73,7 +73,13 @@ export default function ResultsPage() {
             <ScoreCard label="Google Ads" score={googleP.score} color={googleP.color_hex} verdict={googleP.verdict} />
           </div>
 
-          {/* ── 3. CREATIVE ROW ── */}
+          {/* ── 3. PLATFORM METRICS ── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <PlatformMetrics platform="meta"   data={meta.performance  || {}} />
+            <PlatformMetrics platform="google" data={google.summary    || {}} />
+          </div>
+
+          {/* ── 4. CREATIVE ROW ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CreativePanel title="Top Creatives"     subtitle="Highest CTR" tone="top"    creatives={topMeta} />
             <CreativePanel title="Creatives to Kill" subtitle="High spend · low CTR" tone="kill" creatives={killMeta} />
@@ -153,6 +159,68 @@ function ScoreCard({ label, score, color, verdict }) {
         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${score}%`, background: color }} />
       </div>
       <p className="text-xs text-brand-subtext leading-snug">{verdict}</p>
+    </div>
+  );
+}
+
+function PlatformMetrics({ platform, data }) {
+  const isMeta   = platform === "meta";
+  const currency = "AED";
+
+  const fmt  = (n) => n != null ? Number(n).toLocaleString() : "—";
+  const fmtC = (n) => n != null && n > 0 ? `${currency} ${Number(n).toLocaleString()}` : "—";
+  const fmtP = (n) => n != null ? `${Number(n).toFixed(2)}%` : "—";
+  const fmtX = (n) => n != null && n > 0 ? `${Number(n).toFixed(2)}x` : "—";
+
+  const metaKpis = [
+    { label: "Total Spend",       value: fmtC(data.total_spend),            sub: null },
+    { label: "Conversions",       value: fmt(data.total_conversions),        sub: data.total_conversions > 0 ? `CVR ${fmtP(data.blended_cvr)}` : null },
+    { label: "Conv. Value",       value: fmtC(data.total_conversion_value),  sub: data.roas ? `ROAS ${fmtX(data.roas)}` : null },
+    { label: "CPA",               value: fmtC(data.cost_per_conversion),     sub: null },
+    { label: "CTR",               value: fmtP(data.blended_ctr),             sub: `${fmt(data.total_clicks)} clicks` },
+    {
+      label: "Ad Fatigue",
+      value: data.ad_fatigue_label || "—",
+      sub:   data.impressions_per_creative ? `${Number(data.impressions_per_creative).toLocaleString()} impr/creative` : null,
+      highlight: data.ad_fatigue_label === "High" ? "red" : data.ad_fatigue_label === "Medium" ? "amber" : "green",
+    },
+  ];
+
+  const googleKpis = [
+    { label: "Total Spend",       value: fmtC(data.total_spend),            sub: null },
+    { label: "Conversions",       value: fmt(data.total_conversions),        sub: data.cpa ? `CPA ${fmtC(data.cpa)}` : null },
+    { label: "Conv. Value",       value: fmtC(data.total_conv_value),        sub: data.avg_roas > 0 ? `ROAS ${fmtX(data.avg_roas)}` : null },
+    { label: "Wasted Spend",      value: fmtC(data.wasted_spend),            sub: data.wasted_campaigns > 0 ? `${data.wasted_campaigns} campaign(s) ROAS < 1` : null, highlight: data.wasted_spend > 0 ? "red" : null },
+    { label: "Irrelevant Terms",  value: fmtC(data.irrelevant_spend),        sub: "Estimated from broad match", highlight: data.irrelevant_spend > 0 ? "amber" : null },
+    { label: "CTR",               value: fmtP(data.blended_ctr),             sub: `${fmt(data.total_clicks)} clicks` },
+  ];
+
+  const kpis  = isMeta ? metaKpis : googleKpis;
+  const title = isMeta ? "Meta Ads" : "Google Ads";
+  const color = isMeta ? "text-blue-600" : "text-orange-500";
+  const dot   = isMeta ? "bg-blue-500" : "bg-orange-400";
+
+  return (
+    <div className="card p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <span className={`w-2 h-2 rounded-full ${dot}`} />
+        <h3 className={`text-xs font-bold uppercase tracking-widest ${color}`}>{title} — Performance</h3>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {kpis.map((k, i) => {
+          const valColor = k.highlight === "red" ? "text-red-500"
+            : k.highlight === "amber" ? "text-amber-500"
+            : k.highlight === "green" ? "text-emerald-600"
+            : "text-brand-navy";
+          return (
+            <div key={i} className="flex flex-col">
+              <p className="text-[10px] font-semibold text-brand-muted uppercase tracking-wider leading-none mb-1">{k.label}</p>
+              <p className={`text-sm font-bold leading-tight ${valColor}`}>{k.value}</p>
+              {k.sub && <p className="text-[10px] text-brand-muted mt-0.5 leading-snug">{k.sub}</p>}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
