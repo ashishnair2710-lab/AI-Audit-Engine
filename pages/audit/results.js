@@ -103,7 +103,7 @@ export default function ResultsPage() {
             {tab === "overview"    && <OverviewFlags meta={metaP.rubric || []} google={googleP.rubric || []} />}
             {tab === "meta"        && <FlagsPanel rubric={metaP.rubric   || []} />}
             {tab === "google"      && <FlagsPanel rubric={googleP.rubric || []} />}
-            {tab === "competitors" && <ComingSoon />}
+            {tab === "competitors" && <CompetitorPanel competitor={competitor} />}
 
             <div className="mt-5 pt-5 border-t border-brand-border flex justify-center">
               <button onClick={() => setShowFull(!showFull)} className="btn-outline text-sm">
@@ -280,14 +280,164 @@ function FullChecklist({ title, rubric }) {
   );
 }
 
-function ComingSoon() {
+function CompetitorPanel({ competitor }) {
+  const benchmarks  = competitor.benchmarks  || {};
+  const competitors = competitor.competitors || [];
+  const issues      = competitor.issues      || [];
+  const insights    = competitor.insights    || [];
+
+  if (!competitors.length) {
+    return <p className="text-xs text-brand-muted text-center py-8">No competitor data in this audit. Add competitor brands on the home screen.</p>;
+  }
+
+  const userCount   = benchmarks.user_creative_count        || 0;
+  const avgComp     = benchmarks.avg_competitor_creative_count || 0;
+  const compFormats = benchmarks.competitor_formats          || [];
+  const userFormats = benchmarks.user_formats                || [];
+  const formatGaps  = compFormats.filter((f) => !userFormats.includes(f));
+
   return (
-    <div className="text-center py-10 px-4">
-      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-50 flex items-center justify-center">
-        <svg className="w-6 h-6 text-brand-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <div className="space-y-5">
+
+      {/* ── Benchmark strip ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <BenchStat label="Competitors analysed" value={benchmarks.competitors_analyzed || competitors.length} />
+        <BenchStat label="Your creatives"        value={userCount} />
+        <BenchStat label="Avg competitor ads"    value={avgComp}   highlight={avgComp > userCount} />
+        <BenchStat label="Format gaps"           value={formatGaps.length ? formatGaps.join(", ") : "None"} highlight={formatGaps.length > 0} isText />
       </div>
-      <p className="text-sm font-bold text-brand-navy">Competitor Analysis</p>
-      <p className="text-xs text-brand-muted mt-1">Coming soon — live competitor benchmarking.</p>
+
+      {/* ── Issues ── */}
+      {issues.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold text-red-500 uppercase tracking-widest">✗ Gaps identified</p>
+          {issues.map((iss, i) => (
+            <div key={i} className="p-3 rounded-lg border bg-red-50 border-red-200 flex items-start gap-2.5">
+              <span className="text-xs font-bold text-red-500 mt-0.5">✗</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-brand-text leading-snug">{iss.message}</p>
+                {iss.fix && <p className="text-[11px] text-brand-muted mt-0.5">{iss.fix}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Insights ── */}
+      {insights.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold text-brand-purple uppercase tracking-widest">💡 Insights</p>
+          {insights.map((ins, i) => (
+            <div key={i} className="p-3 rounded-lg border bg-purple-50 border-purple-200">
+              <p className="text-xs text-brand-text leading-snug">{ins}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Per-competitor cards ── */}
+      <div className="space-y-4">
+        {competitors.map((comp) => (
+          <CompetitorCard key={comp.brand} comp={comp} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BenchStat({ label, value, highlight, isText }) {
+  return (
+    <div className="rounded-xl border border-brand-border bg-brand-bg p-3">
+      <p className="text-[10px] font-semibold text-brand-muted uppercase tracking-wider mb-1">{label}</p>
+      <p className={`font-bold leading-tight ${isText ? "text-xs" : "text-xl"} ${highlight ? "text-red-500" : "text-brand-navy"}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function CompetitorCard({ comp }) {
+  const [open, setOpen] = useState(false);
+  const ads = comp.ads || [];
+
+  return (
+    <div className="border border-brand-border rounded-xl overflow-hidden">
+      {/* Header row */}
+      <div
+        className="flex items-center justify-between p-3 bg-white cursor-pointer hover:bg-brand-bg transition-colors"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <div className="flex items-center gap-3">
+          {comp.is_winning && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-600">🏆 Winner</span>
+          )}
+          <p className="text-sm font-bold text-brand-navy">{comp.brand}</p>
+          <span className="text-xs text-brand-muted">{comp.ad_count} ads</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex gap-1">
+            {(comp.formats || []).map((f) => (
+              <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-500 capitalize">{f}</span>
+            ))}
+          </div>
+          {comp.duration_days > 0 && (
+            <span className="text-[11px] text-brand-muted whitespace-nowrap">{comp.duration_days}d running</span>
+          )}
+          <svg className={`w-4 h-4 text-brand-muted transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* Expanded ad previews */}
+      {open && (
+        <div className="border-t border-brand-border bg-brand-bg p-3">
+          {ads.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {ads.map((ad, i) => (
+                <a
+                  key={i}
+                  href={ad.snapshot_url || `https://www.facebook.com/ads/library/?id=${ad.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col rounded-lg border border-brand-border bg-white overflow-hidden hover:shadow-md transition-all"
+                >
+                  {ad.image_url ? (
+                    <img src={ad.image_url} alt="" className="w-full h-28 object-cover bg-slate-100" onError={(e) => { e.target.style.display = "none"; }} />
+                  ) : (
+                    <div className="w-full h-28 bg-gradient-to-br from-purple-50 to-slate-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-purple-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                    </div>
+                  )}
+                  <div className="p-2">
+                    {ad.title && <p className="text-[11px] font-semibold text-brand-text line-clamp-1">{ad.title}</p>}
+                    {ad.body  && <p className="text-[10px] text-brand-muted line-clamp-2 mt-0.5">{ad.body}</p>}
+                    <p className="text-[10px] text-brand-purple font-semibold mt-1 group-hover:underline">View ad →</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            /* No live ad data — show hooks instead */
+            <div>
+              {comp.hooks?.length > 0 ? (
+                <div>
+                  <p className="text-[11px] font-semibold text-brand-muted mb-2">Ad hooks detected:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {comp.hooks.map((h, i) => (
+                      <span key={i} className="text-[11px] px-3 py-1.5 rounded-full bg-white border border-brand-border text-brand-text">"{h}"</span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-brand-muted text-center py-4">No ad previews available for this competitor.</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

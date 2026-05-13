@@ -34,6 +34,7 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-6">
           <Link href="/" className="text-brand-muted hover:text-brand-text text-sm font-medium transition-colors">Audit</Link>
+          <Link href="/library" className="text-brand-muted hover:text-brand-text text-sm font-medium transition-colors">Ads Library</Link>
           <Link href="/connect" className="text-brand-muted hover:text-brand-text text-sm font-medium transition-colors">Connect Accounts</Link>
         </div>
 

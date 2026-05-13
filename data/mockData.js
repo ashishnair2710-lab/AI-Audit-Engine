@@ -90,7 +90,7 @@ const mockAuditPayload = {
   competitor_data: [
     {
       brand:        "CompetitorA",
-      ad_count:     38,      // ← 2× more than user's ~5 creatives
+      ad_count:     38,
       formats:      ["video", "image", "carousel"],
       hooks:        [
         "Free delivery on all orders",
@@ -98,7 +98,12 @@ const mockAuditPayload = {
         "Trusted by 50,000 customers",
         "Fast shipping guaranteed",
       ],
-      duration_days: 45,    // ← running 45 days = winning ad
+      duration_days: 45,
+      ads: [
+        { id: "1", page_name: "CompetitorA", title: "Free delivery on all orders", body: "Shop now and get free shipping on every order over AED 150.", image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
+        { id: "2", page_name: "CompetitorA", title: "Limited time — 30% off",      body: "Huge savings this week only. Don't miss out.",               image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
+        { id: "3", page_name: "CompetitorA", title: "Trusted by 50,000 customers", body: "Join thousands of happy customers across the UAE.",           image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
+      ],
     },
     {
       brand:        "CompetitorB",
@@ -110,6 +115,10 @@ const mockAuditPayload = {
         "Easy returns",
       ],
       duration_days: 18,
+      ads: [
+        { id: "4", page_name: "CompetitorB", title: "Exclusive deals — shop now", body: "Hand-picked offers, refreshed daily.", image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
+        { id: "5", page_name: "CompetitorB", title: "Easy 30-day returns",        body: "Not happy? Send it back. No questions asked.", image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
+      ],
     },
     {
       brand:        "CompetitorC",
@@ -119,7 +128,11 @@ const mockAuditPayload = {
         "New arrivals weekly",
         "Best price guaranteed",
       ],
-      duration_days: 60,   // ← strong signal, very long-running
+      duration_days: 60,
+      ads: [
+        { id: "6", page_name: "CompetitorC", title: "New arrivals every week", body: "Fresh styles added every Monday. Be first.", image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
+        { id: "7", page_name: "CompetitorC", title: "Best price guaranteed",   body: "Found it cheaper? We'll match it.",         image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
+      ],
     },
   ],
 };
