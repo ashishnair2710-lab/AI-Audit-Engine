@@ -781,20 +781,20 @@ function OutcomeEngine({ data }) {
       {/* Summary metric strip */}
       <div className="grid grid-cols-3 gap-3 mb-6">
         <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">Recoverable Spend</p>
+          <p className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">You are wasting</p>
           <p className="text-xl font-extrabold text-emerald-400">
             {totalSavings > 0 ? <>AED {Math.round(totalSavings).toLocaleString()}<span className="text-xs font-medium text-emerald-600">/mo</span></> : "—"}
           </p>
         </div>
         <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider mb-0.5">Revenue Upside</p>
+          <p className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider mb-0.5">You could earn more</p>
           <p className="text-xl font-extrabold text-blue-400">
             {totalRevenue > 0 ? <>AED {Math.round(totalRevenue).toLocaleString()}<span className="text-xs font-medium text-blue-600">/mo</span></> : "—"}
           </p>
         </div>
         <div className="rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Easy Wins</p>
-          <p className="text-xl font-extrabold text-white">{quickWins}<span className="text-xs font-medium text-slate-500"> actions</span></p>
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Fix this week</p>
+          <p className="text-xl font-extrabold text-white">{quickWins}<span className="text-xs font-medium text-slate-500"> things</span></p>
         </div>
       </div>
 
