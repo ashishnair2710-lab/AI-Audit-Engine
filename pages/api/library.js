@@ -1,5 +1,5 @@
-import { searchBrandApify } from "../../lib/adAccounts/apifyAdLibrary";
 import { searchBrand }      from "../../lib/adAccounts/metaLibraryClient";
+import { searchBrandApify } from "../../lib/adAccounts/apifyAdLibrary";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -15,16 +15,7 @@ export default async function handler(req, res) {
   const maxResults = Math.min(parseInt(limit, 10) || 30, 100);
   const opts       = { country, limit: maxResults };
 
-  // ── 1. Apify (richest data — images, spend signals) ──────────────────────
-  if (process.env.APIFY_TOKEN) {
-    const result = await searchBrandApify(brand.trim(), opts);
-    if (!result.error) {
-      return res.status(200).json({ ...result, source: "apify" });
-    }
-    console.warn("[Library] Apify failed:", result.error);
-  }
-
-  // ── 2. Meta Library API with system token ────────────────────────────────
+  // ── 1. Meta Library API with system token (free, ~200ms) ─────────────────
   const libraryToken = process.env.META_LIBRARY_TOKEN;
   if (libraryToken) {
     const result = await searchBrand(brand.trim(), { ...opts, token: libraryToken });
@@ -34,7 +25,7 @@ export default async function handler(req, res) {
     console.warn("[Library] Meta system token failed:", result.error);
   }
 
-  // ── 3. User's connected Meta OAuth token (ads_read scope) ────────────────
+  // ── 2. User's connected Meta OAuth token (ads_read scope, free, ~200ms) ──
   const userToken = req.cookies?.meta_access_token;
   if (userToken) {
     const result = await searchBrand(brand.trim(), { ...opts, token: userToken });
@@ -44,13 +35,22 @@ export default async function handler(req, res) {
     console.warn("[Library] Meta user token failed:", result.error);
   }
 
+  // ── 3. Apify fallback (slower ~60-90s, costs money — last resort) ─────────
+  if (process.env.APIFY_TOKEN) {
+    const result = await searchBrandApify(brand.trim(), opts);
+    if (!result.error) {
+      return res.status(200).json({ ...result, source: "apify" });
+    }
+    console.warn("[Library] Apify failed:", result.error);
+  }
+
   return res.status(503).json({
     error:   "No Ad Library source available.",
-    hint:    "Connect your Meta account on /connect, or add APIFY_TOKEN to Vercel environment variables.",
+    hint:    "Connect your Meta account on /connect — the Ads Library uses your existing Meta login automatically. No extra setup needed.",
     sources: {
-      apify:       !!process.env.APIFY_TOKEN,
       meta_system: !!process.env.META_LIBRARY_TOKEN,
       meta_user:   !!userToken,
+      apify:       !!process.env.APIFY_TOKEN,
     },
   });
 }
