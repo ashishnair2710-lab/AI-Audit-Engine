@@ -123,8 +123,8 @@ export default function ResultsPage() {
 
             {showFull && (
               <div className="mt-5 pt-5 border-t border-slate-700 space-y-5">
-                <FullChecklist title="Meta Ads — Full Checklist"   rubric={metaP.rubric   || []} />
-                <FullChecklist title="Google Ads — Full Checklist" rubric={googleP.rubric || []} />
+                <FullChecklist title="Meta Ads: Full Checklist"   rubric={metaP.rubric   || []} />
+                <FullChecklist title="Google Ads: Full Checklist" rubric={googleP.rubric || []} />
               </div>
             )}
           </div>
@@ -212,7 +212,7 @@ function PlatformMetrics({ platform, data }) {
     <div className="card p-5">
       <div className="flex items-center gap-2 mb-4">
         <span className={`w-2 h-2 rounded-full ${dot}`} />
-        <h3 className={`text-xs font-bold uppercase tracking-widest ${color}`}>{title} — Performance</h3>
+        <h3 className={`text-xs font-bold uppercase tracking-widest ${color}`}>{title}</h3>
       </div>
       <div className="grid grid-cols-3 gap-4">
         {kpis.map((k, i) => {
@@ -653,7 +653,7 @@ function computeOutcomes(data) {
     outcomes.push({
       id: "fatigue", platform: "meta", category: "savings",
       effort: "Easy", timeframe: "Immediate",
-      title: "Ad fatigue — CPM going up",
+      title: "Ad fatigue: CPM going up",
       metric: fmtC(cpmPenalty) + " CPM waste/mo",
       metricRaw: cpmPenalty,
       description: "Same people seeing the same ad too often. Meta charges you more for it.",
@@ -674,7 +674,7 @@ function computeOutcomes(data) {
       title: "Build a proper funnel",
       metric: `−28% CPA`,
       metricRaw: monthlySaving,
-      description: "You're going straight for the sale with cold audiences. Warm them up first — it's cheaper.",
+      description: "You're going straight for the sale with cold audiences. Warm them up first. It's cheaper.",
       action: "Add awareness and traffic campaigns. Split budget 30% / 20% / 50% across funnel stages.",
       confidence: 75,
       icon: "funnel",
@@ -775,7 +775,7 @@ function OutcomeEngine({ data }) {
       <div className="mb-5">
         <p className="text-xs font-semibold text-brand-blue uppercase tracking-widest mb-1">What to fix</p>
         <h2 className="text-lg font-bold text-white">Opportunity Engine</h2>
-        <p className="text-xs text-slate-400 mt-0.5">Money left on the table — based on your actual data</p>
+        <p className="text-xs text-slate-400 mt-0.5">Money left on the table. Based on your actual data.</p>
       </div>
 
       {/* Summary metric strip */}

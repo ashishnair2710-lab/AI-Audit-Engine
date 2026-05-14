@@ -39,7 +39,7 @@ export default function HomePage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        const detail = Array.isArray(data.details) && data.details.length ? ` — ${data.details.join("; ")}` : "";
+        const detail = Array.isArray(data.details) && data.details.length ? `: ${data.details.join("; ")}` : "";
         setError((data.error || "Audit failed.") + detail);
         setLoading(false);
         return;
@@ -55,7 +55,7 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>AuditEngine — Full Funnel Ads Audit</title>
+        <title>AuditEngine: Full Funnel Ads Audit</title>
       </Head>
       <div className="min-h-screen bg-brand-bg">
         <Navbar />
@@ -73,7 +73,7 @@ export default function HomePage() {
               <span className="text-brand-accent">{userName ? "what broke this week?" : "Audit Engine"}</span>
             </h1>
             <p className="text-slate-500 text-lg max-w-md mx-auto leading-relaxed">
-              See where your ad budget is leaking — and what to fix first.
+              See where your ad budget is leaking. Fix what matters first.
             </p>
           </div>
 
@@ -130,7 +130,7 @@ export default function HomePage() {
                   <p className="text-[11px] text-brand-muted">
                     {(conn.meta || conn.google)
                       ? `Connected: ${[conn.meta && "Meta", conn.google && "Google"].filter(Boolean).join(" + ")}`
-                      : "No accounts connected — will use demo data"}
+                      : "No accounts connected. Using demo data."}
                   </p>
                 </div>
                 <button

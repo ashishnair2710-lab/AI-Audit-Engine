@@ -31,7 +31,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <Head><title>Sign In — AuditEngine</title></Head>
+      <Head><title>Sign In | AuditEngine</title></Head>
 
       <div className="min-h-screen bg-brand-bg flex flex-col items-center justify-center px-4">
         {/* Logo */}

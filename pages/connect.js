@@ -51,7 +51,7 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
   return (
     <>
       <Head>
-        <title>Connect Ad Accounts — Audit Engine</title>
+        <title>Connect Ad Accounts | Audit Engine</title>
       </Head>
 
       <div className="min-h-screen bg-brand-bg">
@@ -99,7 +99,7 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
                     onChange={(e) => pickAccount(e.target.value)}
                     className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:border-brand-purple"
                   >
-                    <option value="">— Choose an account —</option>
+                    <option value="">Choose an account</option>
                     {accounts.map((a) => (
                       <option key={a.id} value={a.id}>
                         {a.name} {a.business ? `· ${a.business}` : ""} ({a.currency || "—"})
@@ -135,7 +135,7 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
               <div>
                 <p className="text-brand-navy font-semibold text-sm mb-1">Read-only access only</p>
                 <p className="text-slate-500 text-xs leading-relaxed">
-                  We only request read permissions. Tokens are stored in secure httpOnly cookies — never in a database or exposed to third parties. We cannot make changes to your campaigns.
+                  We only request read permissions. Tokens are stored in secure httpOnly cookies, never in a database or shared with third parties. We cannot make changes to your campaigns.
                 </p>
               </div>
             </div>

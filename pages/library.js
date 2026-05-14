@@ -63,7 +63,7 @@ export default function LibraryPage() {
             <input
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
-              placeholder="Brand name — e.g. Chivas Regal"
+              placeholder="Brand name, e.g. Chivas Regal"
               className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:border-brand-purple"
             />
             <select
@@ -101,7 +101,7 @@ export default function LibraryPage() {
                 <p className="text-xs text-red-500">
                   Connect your Meta account on{" "}
                   <a href="/connect" className="underline font-semibold">Connect Accounts</a>
-                  {" "}— the Ads Library uses your existing Meta login automatically. No extra setup needed.
+                  {" "}The Ads Library uses your existing Meta login. No extra setup needed.
                 </p>
               )}
             </div>
