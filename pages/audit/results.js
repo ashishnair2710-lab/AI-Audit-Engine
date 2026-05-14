@@ -129,6 +129,9 @@ export default function ResultsPage() {
             )}
           </div>
 
+          {/* ── 6. OUTCOME ENGINE ── */}
+          <OutcomeEngine data={data} />
+
           {/* ACTIONS */}
           <div className="flex gap-3 justify-center pt-2">
             <a href="/" className="btn-outline">← New Audit</a>
@@ -539,6 +542,312 @@ function CompetitorCard({ comp }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// OUTCOME ENGINE
+// ═══════════════════════════════════════════════════════════════════
+
+function computeOutcomes(data) {
+  const metaRubric   = data.score_platforms?.meta?.google?.rubric || data.score_platforms?.meta?.rubric   || [];
+  const googleRubric = data.score_platforms?.google?.rubric || [];
+  const mp           = data.meta_audit?.performance   || {};
+  const gs           = data.google_audit?.summary     || {};
+
+  const metaSpend    = mp.total_spend       || 0;
+  const googleSpend  = gs.total_spend       || 0;
+  const metaCtr      = mp.blended_ctr       || 0;
+  const metaClicks   = mp.total_clicks      || 0;
+  const metaConv     = mp.total_conversions || 0;
+  const metaCpa      = mp.cost_per_conversion || 0;
+  const metaImpr     = mp.total_impressions || 0;
+  const fatigueLabel = mp.ad_fatigue_label  || "";
+  const wastedSpend  = gs.wasted_spend      || 0;
+  const irrelevant   = gs.irrelevant_spend  || 0;
+
+  const failed = (rubric) => (id) => rubric.some((r) => r.id === id && !r.passed);
+  const mFail  = failed(metaRubric);
+  const gFail  = failed(googleRubric);
+
+  const fmtC = (n) => `AED ${Math.round(n).toLocaleString()}`;
+  const outcomes = [];
+
+  // ── IMMEDIATE SAVINGS ────────────────────────────────────────────
+  if (wastedSpend > 0) {
+    outcomes.push({
+      id: "wasted_spend", platform: "google", category: "savings",
+      effort: "Easy", timeframe: "Immediate",
+      title: "Pause zero-ROAS campaigns",
+      metric: fmtC(wastedSpend) + "/mo",
+      metricRaw: wastedSpend,
+      description: `${gs.wasted_campaigns || "Some"} campaign(s) spending with ROAS below 1×. Every dirham here returns less than it costs.`,
+      action: "Pause or restructure campaigns with ROAS < 1 and reallocate budget to top performers.",
+      confidence: 95,
+      icon: "savings",
+    });
+  }
+
+  if (irrelevant > 0) {
+    outcomes.push({
+      id: "irrelevant_terms", platform: "google", category: "savings",
+      effort: "Easy", timeframe: "1–2 days",
+      title: "Cut irrelevant search terms",
+      metric: fmtC(irrelevant) + "/mo",
+      metricRaw: irrelevant,
+      description: "Broad match keywords are triggering searches unrelated to your product. Estimated waste from broad match spend.",
+      action: "Pull Search Terms Report, add negatives for irrelevant queries. Review weekly.",
+      confidence: 80,
+      icon: "savings",
+    });
+  }
+
+  // ── SIGNAL RECOVERY ──────────────────────────────────────────────
+  if (mFail("META_PIXEL_CAPI") && metaConv > 0) {
+    const recovered = Math.round(metaConv * 0.3);
+    const revenueImpact = Math.round(recovered * (metaCpa || 0));
+    outcomes.push({
+      id: "capi", platform: "meta", category: "revenue",
+      effort: "Medium", timeframe: "3–5 days",
+      title: "Enable Conversions API (CAPI)",
+      metric: `+${recovered} conversions/mo`,
+      metricRaw: revenueImpact,
+      description: "iOS 14+ privacy changes block ~30% of browser-side conversions from being reported. CAPI recovers these via server-side matching.",
+      action: "Enable CAPI via Meta Business Manager → Events Manager. Partner integration recommended.",
+      confidence: 88,
+      icon: "signal",
+    });
+  } else if (mFail("META_PIXEL_CAPI") && metaSpend > 0) {
+    outcomes.push({
+      id: "capi", platform: "meta", category: "revenue",
+      effort: "Medium", timeframe: "3–5 days",
+      title: "Enable Conversions API (CAPI)",
+      metric: "~30% signal recovery",
+      metricRaw: Math.round(metaSpend * 0.1),
+      description: "iOS 14+ blocks browser-side conversion signals. Without CAPI, Meta is optimising on ~70% of actual data.",
+      action: "Enable CAPI via Meta Business Manager → Events Manager.",
+      confidence: 85,
+      icon: "signal",
+    });
+  }
+
+  // ── CTR / CREATIVE UPSIDE ────────────────────────────────────────
+  if (mFail("META_FRESH_7D") && metaClicks > 0) {
+    const uplift = Math.round(metaClicks * 0.18);
+    outcomes.push({
+      id: "creative_refresh", platform: "meta", category: "efficiency",
+      effort: "Medium", timeframe: "7 days",
+      title: "Refresh creatives weekly",
+      metric: `+18% CTR`,
+      metricRaw: uplift,
+      description: `Your creatives haven't been refreshed in 14+ days. Audiences become blind after repeated exposure — CTR decays 15–25% within 2 weeks of a creative going stale.`,
+      action: "Launch 2–3 new ad variations weekly. Test different hooks, first frames, and offers.",
+      confidence: 82,
+      icon: "ctr",
+    });
+  }
+
+  if (fatigueLabel === "High" && metaSpend > 0) {
+    const cpmPenalty = Math.round(metaSpend * 0.25);
+    outcomes.push({
+      id: "fatigue", platform: "meta", category: "savings",
+      effort: "Easy", timeframe: "Immediate",
+      title: "Reduce ad fatigue — CPM rising",
+      metric: fmtC(cpmPenalty) + " CPM overspend/mo",
+      metricRaw: cpmPenalty,
+      description: "High frequency is a warning sign. Meta charges more to reach the same audiences repeatedly — CPM typically inflates 20–40% when frequency exceeds benchmarks.",
+      action: "Cap ad set frequency, rotate creatives, and expand lookalike audiences.",
+      confidence: 78,
+      icon: "efficiency",
+    });
+  }
+
+  // ── FUNNEL GAPS ──────────────────────────────────────────────────
+  const noFullFunnel = mFail("META_FULL_FUNNEL");
+  if (noFullFunnel && metaSpend > 0) {
+    const cpaReduction = 0.28;
+    const monthlySaving = Math.round(metaSpend * cpaReduction * 0.3);
+    outcomes.push({
+      id: "full_funnel", platform: "meta", category: "revenue",
+      effort: "Hard", timeframe: "30–60 days",
+      title: "Build full-funnel Meta structure",
+      metric: `−28% CPA (90-day)`,
+      metricRaw: monthlySaving,
+      description: "Conversion-only campaigns compete for bottom-funnel audiences without warming them first. Full-funnel accounts consistently achieve 25–35% lower CPAs.",
+      action: "Add TOFU awareness (video/reach) and MOFU traffic campaigns. Budget: 30/20/50 split.",
+      confidence: 75,
+      icon: "funnel",
+    });
+  }
+
+  if (!data.meta_audit?.audience_mix?.retargeting && metaSpend > 0) {
+    const retargetingUpside = Math.round(metaSpend * 0.15);
+    outcomes.push({
+      id: "retargeting", platform: "meta", category: "revenue",
+      effort: "Medium", timeframe: "1 week",
+      title: "Launch retargeting campaigns",
+      metric: `3–5× ROAS potential`,
+      metricRaw: retargetingUpside,
+      description: "Site visitors and video viewers who didn't convert are being abandoned. Retargeting these warm audiences typically delivers 3–5× better ROAS than cold prospecting.",
+      action: "Create retargeting ad sets for: website visitors (90d), video viewers (75%), add-to-cart (30d).",
+      confidence: 85,
+      icon: "revenue",
+    });
+  }
+
+  // ── GOOGLE STRUCTURE ─────────────────────────────────────────────
+  if (gFail("G_BRAND_SPLIT") && googleSpend > 0) {
+    const brandProtection = Math.round(googleSpend * 0.08);
+    outcomes.push({
+      id: "brand_split", platform: "google", category: "efficiency",
+      effort: "Easy", timeframe: "2–3 days",
+      title: "Separate brand vs non-brand campaigns",
+      metric: `+20% branded CTR`,
+      metricRaw: brandProtection,
+      description: "Blending brand and non-brand in the same campaign hides true performance. Brand terms inflate ROAS and mask non-brand inefficiency.",
+      action: "Split campaigns. Add brand terms as negatives in non-brand campaigns. Set separate ROAS targets.",
+      confidence: 90,
+      icon: "efficiency",
+    });
+  }
+
+  if (gFail("G_TRACKING") && googleSpend > 0) {
+    outcomes.push({
+      id: "tracking", platform: "google", category: "signal",
+      effort: "Medium", timeframe: "3–5 days",
+      title: "Fix GA4 + GCLID tracking",
+      metric: "Unlock Smart Bidding",
+      metricRaw: Math.round(googleSpend * 0.15),
+      description: "Without clean GA4 + GCLID signals, Smart Bidding (tROAS/tCPA) is optimising on incomplete data — a systematic performance ceiling.",
+      action: "Verify GA4 link in Google Ads. Enable auto-tagging. Confirm GCLID is passing through to GA4.",
+      confidence: 92,
+      icon: "signal",
+    });
+  }
+
+  // Sort: savings first (certain), then by metricRaw desc
+  return outcomes
+    .filter((o) => o.metricRaw > 0 || o.metric.includes("%"))
+    .sort((a, b) => {
+      const catOrder = { savings: 0, signal: 1, revenue: 2, efficiency: 3, funnel: 4 };
+      if (catOrder[a.category] !== catOrder[b.category]) return catOrder[a.category] - catOrder[b.category];
+      return (b.metricRaw || 0) - (a.metricRaw || 0);
+    });
+}
+
+const ICONS = {
+  savings:    { emoji: "💰", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
+  signal:     { emoji: "📡", color: "text-blue-400",    bg: "bg-blue-500/10 border-blue-500/20" },
+  revenue:    { emoji: "📈", color: "text-brand-accent", bg: "bg-emerald-500/10 border-emerald-500/20" },
+  ctr:        { emoji: "⚡", color: "text-yellow-400",  bg: "bg-yellow-500/10 border-yellow-500/20" },
+  efficiency: { emoji: "🎯", color: "text-blue-400",    bg: "bg-blue-500/10 border-blue-500/20" },
+  funnel:     { emoji: "🔻", color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
+};
+
+const EFFORT_COLOR = {
+  Easy:   "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+  Medium: "text-yellow-400  bg-yellow-500/10  border-yellow-500/30",
+  Hard:   "text-red-400     bg-red-500/10     border-red-500/30",
+};
+
+const PLATFORM_BADGE = {
+  meta:   "bg-blue-500/10 text-blue-400 border-blue-500/30",
+  google: "bg-orange-500/10 text-orange-400 border-orange-500/30",
+};
+
+function OutcomeEngine({ data }) {
+  const outcomes = computeOutcomes(data);
+
+  const totalSavings = outcomes
+    .filter((o) => o.category === "savings")
+    .reduce((s, o) => s + (o.metricRaw || 0), 0);
+  const totalRevenue = outcomes
+    .filter((o) => ["revenue", "signal"].includes(o.category))
+    .reduce((s, o) => s + (o.metricRaw || 0), 0);
+  const quickWins = outcomes.filter((o) => o.effort === "Easy").length;
+
+  if (outcomes.length === 0) return null;
+
+  return (
+    <div className="card p-5">
+      {/* Header */}
+      <div className="mb-5">
+        <p className="text-xs font-semibold text-brand-blue uppercase tracking-widest mb-1">Revenue & Efficiency</p>
+        <h2 className="text-lg font-bold text-white">Opportunity Engine</h2>
+        <p className="text-xs text-slate-400 mt-0.5">What fixing these issues is worth — based on your actual spend and performance data</p>
+      </div>
+
+      {/* Summary metric strip */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-center">
+          <p className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">Recoverable Spend</p>
+          <p className="text-xl font-extrabold text-emerald-400">
+            {totalSavings > 0 ? <>AED {Math.round(totalSavings).toLocaleString()}<span className="text-xs font-medium text-emerald-600">/mo</span></> : "—"}
+          </p>
+        </div>
+        <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 px-4 py-3 text-center">
+          <p className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider mb-0.5">Revenue Upside</p>
+          <p className="text-xl font-extrabold text-blue-400">
+            {totalRevenue > 0 ? <>AED {Math.round(totalRevenue).toLocaleString()}<span className="text-xs font-medium text-blue-600">/mo</span></> : "—"}
+          </p>
+        </div>
+        <div className="rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-center">
+          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Easy Wins</p>
+          <p className="text-xl font-extrabold text-white">{quickWins}<span className="text-xs font-medium text-slate-500"> actions</span></p>
+        </div>
+      </div>
+
+      {/* Metric tiles grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {outcomes.map((o) => {
+          const icon = ICONS[o.icon] || ICONS.efficiency;
+          return (
+            <div key={o.id} className="rounded-xl border border-slate-700 bg-slate-800/60 p-4 flex flex-col gap-2.5 hover:border-slate-600 transition-all">
+              {/* Top row: icon + badges */}
+              <div className="flex items-center justify-between">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm border ${icon.bg}`}>
+                  {icon.emoji}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${PLATFORM_BADGE[o.platform]}`}>{o.platform.toUpperCase()}</span>
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${EFFORT_COLOR[o.effort]}`}>{o.effort}</span>
+                </div>
+              </div>
+
+              {/* Big metric */}
+              <div>
+                <p className={`text-xl font-extrabold leading-none ${icon.color}`}>{o.metric}</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">{o.timeframe}</p>
+              </div>
+
+              {/* Title */}
+              <p className="text-xs font-bold text-slate-200 leading-snug">{o.title}</p>
+
+              {/* Description */}
+              <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-3">{o.description}</p>
+
+              {/* Fix hint */}
+              <div className="border-t border-slate-700 pt-2.5 mt-auto">
+                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Fix</p>
+                <p className="text-[11px] text-slate-300 leading-snug line-clamp-2">{o.action}</p>
+              </div>
+
+              {/* Confidence bar */}
+              <div className="flex items-center gap-2 mt-0.5">
+                <div className="flex-1 h-1 bg-slate-700 rounded-full">
+                  <div className="h-full bg-brand-accent rounded-full transition-all" style={{ width: `${o.confidence}%` }} />
+                </div>
+                <span className="text-[10px] font-bold text-slate-500">{o.confidence}% conf.</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="text-[11px] text-slate-600 mt-4 text-center">
+        Estimates based on industry benchmarks applied to your actual spend data. Results vary by account.
+      </p>
     </div>
   );
 }
