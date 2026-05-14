@@ -582,8 +582,8 @@ function computeOutcomes(data) {
       title: "Pause zero-ROAS campaigns",
       metric: fmtC(wastedSpend) + "/mo",
       metricRaw: wastedSpend,
-      description: `${gs.wasted_campaigns || "Some"} campaign(s) spending with ROAS below 1×. Every dirham here returns less than it costs.`,
-      action: "Pause or restructure campaigns with ROAS < 1 and reallocate budget to top performers.",
+      description: `${gs.wasted_campaigns || "Some"} campaign(s) spending money and returning less than AED 1 back. Pure loss.`,
+      action: "Pause them. Move budget to campaigns that actually convert.",
       confidence: 95,
       icon: "savings",
     });
@@ -596,8 +596,8 @@ function computeOutcomes(data) {
       title: "Cut irrelevant search terms",
       metric: fmtC(irrelevant) + "/mo",
       metricRaw: irrelevant,
-      description: "Broad match keywords are triggering searches unrelated to your product. Estimated waste from broad match spend.",
-      action: "Pull Search Terms Report, add negatives for irrelevant queries. Review weekly.",
+      description: "Broad match is showing your ads to people searching for completely different things.",
+      action: "Open Search Terms Report → add negatives for anything irrelevant.",
       confidence: 80,
       icon: "savings",
     });
@@ -610,11 +610,11 @@ function computeOutcomes(data) {
     outcomes.push({
       id: "capi", platform: "meta", category: "revenue",
       effort: "Medium", timeframe: "3–5 days",
-      title: "Enable Conversions API (CAPI)",
+      title: "Turn on Conversions API",
       metric: `+${recovered} conversions/mo`,
       metricRaw: revenueImpact,
-      description: "iOS 14+ privacy changes block ~30% of browser-side conversions from being reported. CAPI recovers these via server-side matching.",
-      action: "Enable CAPI via Meta Business Manager → Events Manager. Partner integration recommended.",
+      description: "iOS privacy blocks ~30% of your conversions from reaching Meta. It's optimising blind.",
+      action: "Enable CAPI in Meta Events Manager. Use a partner integration if possible.",
       confidence: 88,
       icon: "signal",
     });
@@ -622,11 +622,11 @@ function computeOutcomes(data) {
     outcomes.push({
       id: "capi", platform: "meta", category: "revenue",
       effort: "Medium", timeframe: "3–5 days",
-      title: "Enable Conversions API (CAPI)",
-      metric: "~30% signal recovery",
+      title: "Turn on Conversions API",
+      metric: "~30% more signal",
       metricRaw: Math.round(metaSpend * 0.1),
-      description: "iOS 14+ blocks browser-side conversion signals. Without CAPI, Meta is optimising on ~70% of actual data.",
-      action: "Enable CAPI via Meta Business Manager → Events Manager.",
+      description: "iOS privacy hides roughly 30% of your conversions from Meta. It's bidding with bad data.",
+      action: "Enable CAPI in Meta Events Manager.",
       confidence: 85,
       icon: "signal",
     });
@@ -638,11 +638,11 @@ function computeOutcomes(data) {
     outcomes.push({
       id: "creative_refresh", platform: "meta", category: "efficiency",
       effort: "Medium", timeframe: "7 days",
-      title: "Refresh creatives weekly",
+      title: "Refresh your creatives",
       metric: `+18% CTR`,
       metricRaw: uplift,
-      description: `Your creatives haven't been refreshed in 14+ days. Audiences become blind after repeated exposure — CTR decays 15–25% within 2 weeks of a creative going stale.`,
-      action: "Launch 2–3 new ad variations weekly. Test different hooks, first frames, and offers.",
+      description: "Your ads haven't changed in 14+ days. People have seen them. CTR drops fast after that.",
+      action: "Upload 2–3 fresh ads this week. Different hook, different format.",
       confidence: 82,
       icon: "ctr",
     });
@@ -653,11 +653,11 @@ function computeOutcomes(data) {
     outcomes.push({
       id: "fatigue", platform: "meta", category: "savings",
       effort: "Easy", timeframe: "Immediate",
-      title: "Reduce ad fatigue — CPM rising",
-      metric: fmtC(cpmPenalty) + " CPM overspend/mo",
+      title: "Ad fatigue — CPM going up",
+      metric: fmtC(cpmPenalty) + " CPM waste/mo",
       metricRaw: cpmPenalty,
-      description: "High frequency is a warning sign. Meta charges more to reach the same audiences repeatedly — CPM typically inflates 20–40% when frequency exceeds benchmarks.",
-      action: "Cap ad set frequency, rotate creatives, and expand lookalike audiences.",
+      description: "Same people seeing the same ad too often. Meta charges you more for it.",
+      action: "Rotate creatives. Expand your audience. Set a frequency cap.",
       confidence: 78,
       icon: "efficiency",
     });
@@ -671,11 +671,11 @@ function computeOutcomes(data) {
     outcomes.push({
       id: "full_funnel", platform: "meta", category: "revenue",
       effort: "Hard", timeframe: "30–60 days",
-      title: "Build full-funnel Meta structure",
-      metric: `−28% CPA (90-day)`,
+      title: "Build a proper funnel",
+      metric: `−28% CPA`,
       metricRaw: monthlySaving,
-      description: "Conversion-only campaigns compete for bottom-funnel audiences without warming them first. Full-funnel accounts consistently achieve 25–35% lower CPAs.",
-      action: "Add TOFU awareness (video/reach) and MOFU traffic campaigns. Budget: 30/20/50 split.",
+      description: "You're going straight for the sale with cold audiences. Warm them up first — it's cheaper.",
+      action: "Add awareness and traffic campaigns. Split budget 30% / 20% / 50% across funnel stages.",
       confidence: 75,
       icon: "funnel",
     });
@@ -686,11 +686,11 @@ function computeOutcomes(data) {
     outcomes.push({
       id: "retargeting", platform: "meta", category: "revenue",
       effort: "Medium", timeframe: "1 week",
-      title: "Launch retargeting campaigns",
-      metric: `3–5× ROAS potential`,
+      title: "Add retargeting",
+      metric: `3–5× ROAS`,
       metricRaw: retargetingUpside,
-      description: "Site visitors and video viewers who didn't convert are being abandoned. Retargeting these warm audiences typically delivers 3–5× better ROAS than cold prospecting.",
-      action: "Create retargeting ad sets for: website visitors (90d), video viewers (75%), add-to-cart (30d).",
+      description: "People who visited your site and didn't buy are being ignored. They're your easiest customers.",
+      action: "Create retargeting ad sets: site visitors (90d), video viewers (75%), add-to-cart (30d).",
       confidence: 85,
       icon: "revenue",
     });
@@ -702,11 +702,11 @@ function computeOutcomes(data) {
     outcomes.push({
       id: "brand_split", platform: "google", category: "efficiency",
       effort: "Easy", timeframe: "2–3 days",
-      title: "Separate brand vs non-brand campaigns",
+      title: "Split brand vs non-brand",
       metric: `+20% branded CTR`,
       metricRaw: brandProtection,
-      description: "Blending brand and non-brand in the same campaign hides true performance. Brand terms inflate ROAS and mask non-brand inefficiency.",
-      action: "Split campaigns. Add brand terms as negatives in non-brand campaigns. Set separate ROAS targets.",
+      description: "Brand and non-brand in the same campaign hides what's actually working.",
+      action: "Create separate campaigns. Add brand terms as negatives in the non-brand one.",
       confidence: 90,
       icon: "efficiency",
     });
@@ -716,11 +716,11 @@ function computeOutcomes(data) {
     outcomes.push({
       id: "tracking", platform: "google", category: "signal",
       effort: "Medium", timeframe: "3–5 days",
-      title: "Fix GA4 + GCLID tracking",
+      title: "Fix GA4 tracking",
       metric: "Unlock Smart Bidding",
       metricRaw: Math.round(googleSpend * 0.15),
-      description: "Without clean GA4 + GCLID signals, Smart Bidding (tROAS/tCPA) is optimising on incomplete data — a systematic performance ceiling.",
-      action: "Verify GA4 link in Google Ads. Enable auto-tagging. Confirm GCLID is passing through to GA4.",
+      description: "Your tracking isn't clean. Smart Bidding is making decisions on incomplete data.",
+      action: "Check GA4 is linked in Google Ads. Enable auto-tagging. Confirm GCLID is tracking.",
       confidence: 92,
       icon: "signal",
     });
@@ -773,9 +773,9 @@ function OutcomeEngine({ data }) {
     <div className="card p-5">
       {/* Header */}
       <div className="mb-5">
-        <p className="text-xs font-semibold text-brand-blue uppercase tracking-widest mb-1">Revenue & Efficiency</p>
+        <p className="text-xs font-semibold text-brand-blue uppercase tracking-widest mb-1">What to fix</p>
         <h2 className="text-lg font-bold text-white">Opportunity Engine</h2>
-        <p className="text-xs text-slate-400 mt-0.5">What fixing these issues is worth — based on your actual spend and performance data</p>
+        <p className="text-xs text-slate-400 mt-0.5">Money left on the table — based on your actual data</p>
       </div>
 
       {/* Summary metric strip */}
@@ -845,9 +845,7 @@ function OutcomeEngine({ data }) {
         })}
       </div>
 
-      <p className="text-[11px] text-slate-600 mt-4 text-center">
-        Estimates based on industry benchmarks applied to your actual spend data. Results vary by account.
-      </p>
+      <p className="text-[11px] text-slate-600 mt-4 text-center">Based on benchmarks + your actual spend. Results vary.</p>
     </div>
   );
 }

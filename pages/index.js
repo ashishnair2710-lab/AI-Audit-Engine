@@ -69,11 +69,11 @@ export default function HomePage() {
               AI-Powered Audit Engine
             </span>
             <h1 className="text-5xl sm:text-6xl font-extrabold text-brand-navy leading-[1.1] mb-5 tracking-tight">
-              {userName ? `Welcome back, ${userName.split(" ")[0]}.` : "Full Funnel"}<br />
-              <span className="text-brand-accent">{userName ? "Ready to audit?" : "Audit Engine"}</span>
+              {userName ? `Hey ${userName.split(" ")[0]},` : "Full Funnel"}<br />
+              <span className="text-brand-accent">{userName ? "what broke this week?" : "Audit Engine"}</span>
             </h1>
-            <p className="text-slate-500 text-xl max-w-xl mx-auto leading-relaxed">
-              Know exactly where your Meta and Google budget is leaking — and what to fix first.
+            <p className="text-slate-500 text-lg max-w-md mx-auto leading-relaxed">
+              See where your ad budget is leaking — and what to fix first.
             </p>
           </div>
 
@@ -187,14 +187,11 @@ export default function HomePage() {
           <section className="mt-24">
             {/* Section label */}
             <div className="text-center mb-10">
-              <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-brand-accent mb-3">How it works</span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-navy leading-tight mb-4">
+              <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-brand-accent mb-3">What it checks</span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-navy leading-tight mb-3">
                 700+ checks. Every audit.<br />
-                <span className="text-brand-accent">So you focus on strategy.</span>
+                <span className="text-brand-accent">You just read the report.</span>
               </h2>
-              <p className="text-slate-500 text-base max-w-lg mx-auto leading-relaxed">
-                The engine audits your full ad funnel in under 60 seconds — then tells you exactly what to fix, in order of revenue impact.
-              </p>
             </div>
 
             {/* Stats strip */}
@@ -218,44 +215,44 @@ export default function HomePage() {
                 {
                   icon: "📊",
                   title: "Funnel Health Score",
-                  sub: "0–100 across Meta, Google & Competitors",
+                  sub: "0–100, both platforms",
                   points: [
-                    "Campaign structure & objective alignment",
-                    "Creative freshness & format coverage",
-                    "Audience segmentation quality",
+                    "Campaign structure",
+                    "Creative freshness",
+                    "Audience setup",
                   ],
                   accent: "brand-accent",
                 },
                 {
                   icon: "💸",
-                  title: "Wasted Spend Finder",
-                  sub: "Exact AED value, per campaign",
+                  title: "Wasted Spend",
+                  sub: "Exact AED, per campaign",
                   points: [
-                    "Zero-ROAS campaigns burning budget",
-                    "Irrelevant search terms from broad match",
-                    "Ad fatigue CPM inflation alerts",
+                    "Campaigns with ROAS below 1×",
+                    "Search terms that don't convert",
+                    "Ad fatigue draining your CPM",
                   ],
                   accent: "brand-blue",
                 },
                 {
                   icon: "🎯",
-                  title: "Competitor Intelligence",
+                  title: "Competitor Gaps",
                   sub: "Live from Meta Ads Library",
                   points: [
-                    "Creative formats your competitors run",
-                    "How long their top ads have been live",
-                    "Format & hook gaps in your own account",
+                    "Formats your rivals are running",
+                    "How long their top ads have run",
+                    "What's missing from your account",
                   ],
                   accent: "orange-500",
                 },
                 {
                   icon: "⚡",
-                  title: "Opportunity Engine",
-                  sub: "Fixes ranked by revenue impact",
+                  title: "What to Fix First",
+                  sub: "Sorted by money impact",
                   points: [
-                    "Exact AED recoverable / month",
-                    "Effort level & time to results",
-                    "CAPI, tracking, and signal gaps",
+                    "AED saved or earned per fix",
+                    "Easy / Medium / Hard effort",
+                    "How long it takes to see results",
                   ],
                   accent: "brand-accent",
                 },
