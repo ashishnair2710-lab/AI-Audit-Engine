@@ -22,8 +22,8 @@ export default function Navbar() {
     return (
       <Link
         href={href}
-        className={`text-sm font-medium transition-colors ${
-          active ? "text-white" : "text-slate-400 hover:text-white"
+        className={`text-sm font-semibold transition-colors ${
+          active ? "text-brand-purple" : "text-brand-subtext hover:text-brand-black"
         }`}
       >
         {label}
@@ -32,19 +32,19 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0F172A] border-b border-slate-800">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-brand-border">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-brand-accent flex items-center justify-center shadow-glow">
+          <div className="w-8 h-8 rounded-lg bg-brand-purple flex items-center justify-center">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M2 12L6 7.5L9 10.5L13 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <circle cx="13" cy="3.5" r="1.5" fill="white"/>
             </svg>
           </div>
-          <span className="font-bold text-white text-lg tracking-tight">
-            Audit<span className="text-brand-accent">Engine</span>
+          <span className="font-bold text-brand-black text-lg tracking-tight">
+            Audit<span className="text-brand-purple">Engine</span>
           </span>
         </Link>
 
@@ -59,15 +59,15 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           {userName && (
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center">
-                <span className="text-xs font-bold text-brand-accent">{userName[0]?.toUpperCase()}</span>
+              <div className="w-7 h-7 rounded-full bg-brand-purple/10 border border-brand-purple/20 flex items-center justify-center">
+                <span className="text-xs font-bold text-brand-purple">{userName[0]?.toUpperCase()}</span>
               </div>
-              <span className="text-sm text-slate-300 font-medium hidden sm:block">{userName}</span>
+              <span className="text-sm text-brand-subtext font-medium hidden sm:block">{userName}</span>
             </div>
           )}
           <button
             onClick={logout}
-            className="text-sm font-medium text-slate-400 hover:text-white border border-slate-700 hover:border-slate-500 px-4 py-1.5 rounded-lg transition-all"
+            className="text-sm font-semibold text-brand-subtext hover:text-brand-black border border-brand-border hover:border-gray-300 px-4 py-1.5 rounded-lg transition-all"
           >
             Sign Out
           </button>

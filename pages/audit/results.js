@@ -18,13 +18,13 @@ export default function ResultsPage() {
   }, []);
 
   if (error) return (
-    <div className="min-h-screen bg-brand-bg flex items-center justify-center">
-      <div className="text-center"><p className="text-red-400 mb-4">{error}</p><a href="/" className="btn-primary">← Run Audit</a></div>
+    <div className="min-h-screen bg-brand-gray flex items-center justify-center">
+      <div className="text-center"><p className="text-red-500 mb-4">{error}</p><a href="/" className="btn-primary">Back to Audit</a></div>
     </div>
   );
   if (!data) return (
-    <div className="min-h-screen bg-brand-bg flex items-center justify-center">
-      <div className="w-10 h-10 border-2 border-brand-accent border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-screen bg-brand-gray flex items-center justify-center">
+      <div className="w-10 h-10 border-2 border-brand-purple border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
@@ -32,66 +32,66 @@ export default function ResultsPage() {
   const google     = data.google_audit        || {};
   const competitor = data.competitor_insights || {};
   const platforms  = data.score_platforms     || {};
-  const overall    = { score: data.funnel_health_score || 0, color_hex: data.score_color_hex || "#22C55E", verdict: data.score_verdict || data.score_label || "" };
-  const metaP      = platforms.meta   || { score: 0, color_hex: "#94a3b8", verdict: "—", rubric: [] };
-  const googleP    = platforms.google || { score: 0, color_hex: "#94a3b8", verdict: "—", rubric: [] };
+  const overall    = { score: data.funnel_health_score || 0, color_hex: data.score_color_hex || "#6B5FE4", verdict: data.score_verdict || data.score_label || "" };
+  const metaP      = platforms.meta   || { score: 0, color_hex: "#9CA3AF", verdict: "—", rubric: [] };
+  const googleP    = platforms.google || { score: 0, color_hex: "#9CA3AF", verdict: "—", rubric: [] };
   const mode       = data.score_mode || "ecom";
   const clientName = data.client_name || "Untitled Client";
 
-  const topMeta    = meta.top_creatives || [];
-  const killMeta   = meta.underperforming_creatives || [];
+  const topMeta  = meta.top_creatives || [];
+  const killMeta = meta.underperforming_creatives || [];
 
   return (
     <>
       <Head><title>Audit · {overall.score}/100</title></Head>
-      <div className="min-h-screen bg-brand-bg">
+      <div className="min-h-screen bg-brand-gray">
         <Navbar />
         <main className="pt-20 pb-16 px-4 sm:px-6 max-w-7xl mx-auto space-y-6">
 
-          {/* ── 1. TOP BAR ── */}
+          {/* 1. TOP BAR */}
           <div className="pt-3 flex items-center justify-between flex-wrap gap-3">
             <div>
-              <p className="text-xs font-semibold text-brand-blue uppercase tracking-widest mb-1">Performance Audit</p>
-              <h1 className="text-2xl font-bold text-brand-navy">{clientName}</h1>
+              <p className="text-xs font-semibold text-brand-purple uppercase tracking-widest mb-1">Performance Audit</p>
+              <h1 className="text-2xl font-bold text-brand-black">{clientName}</h1>
             </div>
             <div className="flex items-center gap-2">
               <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
                 mode === "ecom"
-                  ? "bg-blue-50 text-brand-blue border-blue-200"
+                  ? "bg-blue-50 text-blue-600 border-blue-200"
                   : "bg-amber-50 text-amber-700 border-amber-200"
               }`}>
                 {mode === "ecom" ? "eCommerce" : "Lead Generation"}
               </span>
-              <span className="text-xs text-slate-500 bg-white border border-brand-border px-3 py-1.5 rounded-full">
+              <span className="text-xs text-brand-muted bg-white border border-brand-border px-3 py-1.5 rounded-full">
                 {new Date().toLocaleDateString("en-AE", { day: "numeric", month: "short", year: "numeric" })}
               </span>
             </div>
           </div>
 
-          {/* ── 2. SCORE ROW ── */}
+          {/* 2. SCORE ROW */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <ScoreCard label="Overall Health"  score={overall.score} color={overall.color_hex} verdict={overall.verdict} />
             <ScoreCard label="Meta Ads"        score={metaP.score}   color={metaP.color_hex}   verdict={metaP.verdict} />
             <ScoreCard label="Google Ads"      score={googleP.score} color={googleP.color_hex} verdict={googleP.verdict} />
           </div>
 
-          {/* ── 3. PLATFORM METRICS ── */}
+          {/* 3. PLATFORM METRICS */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <PlatformMetrics platform="meta"   data={meta.performance || {}} />
             <PlatformMetrics platform="google" data={google.summary   || {}} />
           </div>
 
-          {/* ── 4. CREATIVE ROW ── */}
+          {/* 4. CREATIVE ROW */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <CreativePanel title="Top Performers"  subtitle="Highest CTR" tone="top"  creatives={topMeta} />
             <CreativePanel title="Drain Ads"       subtitle="High spend · low CTR" tone="kill" creatives={killMeta} />
           </div>
 
-          {/* ── 5. FUNNEL HEALTH PANEL ── */}
+          {/* 5. FUNNEL HEALTH PANEL */}
           <div className="card p-5">
             <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
-              <h2 className="text-lg font-bold text-white">Funnel Health</h2>
-              <div className="flex gap-1 bg-slate-900 border border-slate-700 rounded-lg p-1">
+              <h2 className="text-lg font-bold text-brand-black">Funnel Health</h2>
+              <div className="flex gap-1 bg-brand-gray border border-brand-border rounded-lg p-1">
                 {[
                   { id: "overview",    label: "Overview" },
                   { id: "meta",        label: "Meta Ads" },
@@ -101,8 +101,8 @@ export default function ResultsPage() {
                   <button key={t.id} onClick={() => setTab(t.id)}
                     className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
                       tab === t.id
-                        ? "bg-brand-accent text-white shadow-sm"
-                        : "text-slate-400 hover:text-white"
+                        ? "bg-brand-purple text-white shadow-sm"
+                        : "text-brand-muted hover:text-brand-black"
                     }`}>
                     {t.label}
                   </button>
@@ -115,26 +115,26 @@ export default function ResultsPage() {
             {tab === "google"      && <FlagsPanel rubric={googleP.rubric || []} />}
             {tab === "competitors" && <CompetitorPanel competitor={competitor} />}
 
-            <div className="mt-5 pt-5 border-t border-slate-700 flex justify-center">
+            <div className="mt-5 pt-5 border-t border-brand-border flex justify-center">
               <button onClick={() => setShowFull(!showFull)} className="btn-outline text-sm">
                 {showFull ? "Hide full audit" : "View full audit →"}
               </button>
             </div>
 
             {showFull && (
-              <div className="mt-5 pt-5 border-t border-slate-700 space-y-5">
+              <div className="mt-5 pt-5 border-t border-brand-border space-y-5">
                 <FullChecklist title="Meta Ads: Full Checklist"   rubric={metaP.rubric   || []} />
                 <FullChecklist title="Google Ads: Full Checklist" rubric={googleP.rubric || []} />
               </div>
             )}
           </div>
 
-          {/* ── 6. OUTCOME ENGINE ── */}
+          {/* 6. OUTCOME ENGINE */}
           <OutcomeEngine data={data} />
 
           {/* ACTIONS */}
           <div className="flex gap-3 justify-center pt-2">
-            <a href="/" className="btn-outline">← New Audit</a>
+            <a href="/" className="btn-outline">New Audit</a>
             <button
               onClick={() => {
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -158,15 +158,15 @@ function ScoreCard({ label, score, color, verdict }) {
   return (
     <div className="card p-5">
       <div className="flex items-baseline justify-between mb-3">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{label}</p>
+        <p className="text-xs font-semibold text-brand-muted uppercase tracking-widest">{label}</p>
         <p className="text-3xl font-extrabold leading-none" style={{ color }}>
-          {score}<span className="text-base text-slate-500 font-bold">/100</span>
+          {score}<span className="text-base text-brand-muted font-bold">/100</span>
         </p>
       </div>
-      <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden mb-3">
+      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${score}%`, background: color }} />
       </div>
-      <p className="text-xs text-slate-300 leading-snug">{verdict}</p>
+      <p className="text-xs text-brand-subtext leading-snug">{verdict}</p>
     </div>
   );
 }
@@ -205,8 +205,8 @@ function PlatformMetrics({ platform, data }) {
 
   const kpis  = isMeta ? metaKpis : googleKpis;
   const title = isMeta ? "Meta Ads" : "Google Ads";
-  const color = isMeta ? "text-brand-blue" : "text-orange-400";
-  const dot   = isMeta ? "bg-brand-blue"   : "bg-orange-400";
+  const color = isMeta ? "text-blue-600"   : "text-orange-500";
+  const dot   = isMeta ? "bg-blue-500"     : "bg-orange-500";
 
   return (
     <div className="card p-5">
@@ -216,15 +216,15 @@ function PlatformMetrics({ platform, data }) {
       </div>
       <div className="grid grid-cols-3 gap-4">
         {kpis.map((k, i) => {
-          const valColor = k.highlight === "red"   ? "text-red-400"
-            : k.highlight === "amber"  ? "text-amber-400"
-            : k.highlight === "green"  ? "text-brand-accent"
-            : "text-white";
+          const valColor = k.highlight === "red"   ? "text-red-500"
+            : k.highlight === "amber"  ? "text-amber-600"
+            : k.highlight === "green"  ? "text-green-600"
+            : "text-brand-black";
           return (
             <div key={i} className="flex flex-col">
-              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider leading-none mb-1">{k.label}</p>
+              <p className="text-[10px] font-semibold text-brand-muted uppercase tracking-wider leading-none mb-1">{k.label}</p>
               <p className={`text-sm font-bold leading-tight ${valColor}`}>{k.value}</p>
-              {k.sub && <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">{k.sub}</p>}
+              {k.sub && <p className="text-[10px] text-brand-muted mt-0.5 leading-snug">{k.sub}</p>}
             </div>
           );
         })}
@@ -235,35 +235,35 @@ function PlatformMetrics({ platform, data }) {
 
 function CreativePanel({ title, subtitle, tone, creatives }) {
   const accent = tone === "top"
-    ? { bar: "bg-brand-accent", chip: "bg-emerald-900/30 text-emerald-400 border-emerald-700/50" }
-    : { bar: "bg-red-500",      chip: "bg-red-900/30 text-red-400 border-red-700/50" };
+    ? { bar: "bg-green-500",  chip: "bg-green-50 text-green-700 border-green-200" }
+    : { bar: "bg-red-500",    chip: "bg-red-50 text-red-600 border-red-200" };
 
   return (
     <div className="card p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-base font-bold text-white">{title}</h3>
-          <p className="text-[11px] text-slate-400">{subtitle}</p>
+          <h3 className="text-base font-bold text-brand-black">{title}</h3>
+          <p className="text-[11px] text-brand-muted">{subtitle}</p>
         </div>
         <span className={`w-2 h-6 rounded-full ${accent.bar}`} />
       </div>
       {creatives.length === 0 ? (
-        <p className="text-xs text-slate-500 py-6 text-center">No data yet.</p>
+        <p className="text-xs text-brand-muted py-6 text-center">No data yet.</p>
       ) : (
         <div className="space-y-3">
           {creatives.slice(0, 3).map((c, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-800 border border-slate-700 hover:border-slate-600 transition-all">
+            <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-brand-gray border border-brand-border hover:border-gray-300 transition-all">
               <Thumbnail src={c.thumbnail} format={c.format} previewUrl={c.preview_url} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-slate-100 line-clamp-2 leading-snug">{c.label || c.name || "Untitled Ad"}</p>
+                <p className="text-sm font-semibold text-brand-black line-clamp-2 leading-snug">{c.label || c.name || "Untitled Ad"}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-700 px-1.5 py-0.5 rounded">{c.format || "ad"}</span>
-                  {c.spend > 0     && <span className="text-[10px] text-slate-500">AED {Math.round(c.spend).toLocaleString()} spent</span>}
-                  {c.impressions > 0 && <span className="text-[10px] text-slate-500">· {Number(c.impressions).toLocaleString()} impr</span>}
+                  <span className="text-[10px] font-bold text-brand-muted uppercase tracking-wider bg-white border border-brand-border px-1.5 py-0.5 rounded">{c.format || "ad"}</span>
+                  {c.spend > 0       && <span className="text-[10px] text-brand-muted">AED {Math.round(c.spend).toLocaleString()} spent</span>}
+                  {c.impressions > 0 && <span className="text-[10px] text-brand-muted">· {Number(c.impressions).toLocaleString()} impr</span>}
                 </div>
                 {c.preview_url && (
                   <a href={c.preview_url} target="_blank" rel="noopener noreferrer"
-                    className="text-[10px] text-blue-400 font-semibold hover:underline mt-1 flex items-center gap-0.5">
+                    className="text-[10px] text-brand-purple font-semibold hover:underline mt-1 flex items-center gap-0.5">
                     View ad preview ↗
                   </a>
                 )}
@@ -281,13 +281,13 @@ function CreativePanel({ title, subtitle, tone, creatives }) {
 
 function Thumbnail({ src, format, previewUrl }) {
   const inner = src ? (
-    <img src={src} alt="" className="w-20 h-20 rounded-lg object-cover bg-slate-700 flex-shrink-0 ring-1 ring-slate-600" />
+    <img src={src} alt="" className="w-20 h-20 rounded-lg object-cover bg-brand-gray flex-shrink-0 ring-1 ring-brand-border" />
   ) : (
-    <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-slate-700 to-slate-600 flex flex-col items-center justify-center flex-shrink-0 gap-1">
-      <svg className="w-6 h-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="w-20 h-20 rounded-lg bg-brand-gray border border-brand-border flex flex-col items-center justify-center flex-shrink-0 gap-1">
+      <svg className="w-6 h-6 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
       </svg>
-      <span className="text-[9px] text-slate-500 font-medium uppercase tracking-wide">{format || "ad"}</span>
+      <span className="text-[9px] text-brand-muted font-medium uppercase tracking-wide">{format || "ad"}</span>
     </div>
   );
 
@@ -295,7 +295,7 @@ function Thumbnail({ src, format, previewUrl }) {
     return (
       <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 group relative">
         {inner}
-        <div className="absolute inset-0 rounded-lg bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        <div className="absolute inset-0 rounded-lg bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <span className="text-white text-[9px] font-bold">Preview</span>
         </div>
       </a>
@@ -320,13 +320,13 @@ function FlagsGrid({ passed, failed }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div>
-        <p className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest mb-2">✓ Passing</p>
+        <p className="text-[11px] font-bold text-green-600 uppercase tracking-widest mb-2">Passing</p>
         <div className="space-y-2">
           {passed.length ? passed.map((r, i) => <Flag key={i} rule={r} pass />) : <Empty />}
         </div>
       </div>
       <div>
-        <p className="text-[11px] font-bold text-red-400 uppercase tracking-widest mb-2">✗ Failing</p>
+        <p className="text-[11px] font-bold text-red-500 uppercase tracking-widest mb-2">Failing</p>
         <div className="space-y-2">
           {failed.length ? failed.map((r, i) => <Flag key={i} rule={r} />) : <Empty />}
         </div>
@@ -338,36 +338,36 @@ function FlagsGrid({ passed, failed }) {
 function Flag({ rule, pass }) {
   return (
     <div className={`p-3 rounded-lg border flex items-start gap-2.5 ${
-      pass ? "bg-emerald-500/10 border-emerald-500/30" : "bg-red-500/10 border-red-500/30"
+      pass ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
     }`}>
-      <span className={`text-xs font-bold mt-0.5 ${pass ? "text-emerald-400" : "text-red-400"}`}>{pass ? "✓" : "✗"}</span>
+      <span className={`text-xs font-bold mt-0.5 ${pass ? "text-green-600" : "text-red-500"}`}>{pass ? "✓" : "✗"}</span>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold text-slate-200 leading-snug">{rule.label}</p>
-        {!pass && rule.flag && <p className="text-[11px] text-slate-400 mt-0.5">{rule.flag}</p>}
+        <p className="text-xs font-semibold text-brand-black leading-snug">{rule.label}</p>
+        {!pass && rule.flag && <p className="text-[11px] text-brand-subtext mt-0.5">{rule.flag}</p>}
       </div>
-      <span className={`text-[10px] font-bold whitespace-nowrap ${pass ? "text-emerald-400" : "text-red-400"}`}>+{rule.points}</span>
+      <span className={`text-[10px] font-bold whitespace-nowrap ${pass ? "text-green-600" : "text-red-500"}`}>+{rule.points}</span>
     </div>
   );
 }
 
 function Empty() {
-  return <p className="text-xs text-slate-500 text-center py-4">No data.</p>;
+  return <p className="text-xs text-brand-muted text-center py-4">No data.</p>;
 }
 
 function FullChecklist({ title, rubric }) {
   if (!rubric.length) return null;
   return (
     <div>
-      <h4 className="text-sm font-bold text-white mb-3">{title}</h4>
+      <h4 className="text-sm font-bold text-brand-black mb-3">{title}</h4>
       <div className="space-y-1.5">
         {rubric.map((r, i) => (
           <div key={i} className={`flex items-center gap-3 p-2.5 rounded-md border text-xs ${
-            r.passed ? "bg-emerald-500/10 border-emerald-500/20" : "bg-red-500/10 border-red-500/20"
+            r.passed ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
           }`}>
-            <span className={`font-bold ${r.passed ? "text-emerald-400" : "text-red-400"}`}>{r.passed ? "✓" : "✗"}</span>
-            <span className="flex-1 text-slate-200">{r.label}</span>
-            {!r.passed && <span className="text-slate-400 text-[11px] hidden md:inline">{r.flag}</span>}
-            <span className={`font-bold ${r.passed ? "text-emerald-400" : "text-red-400"}`}>+{r.points}</span>
+            <span className={`font-bold ${r.passed ? "text-green-600" : "text-red-500"}`}>{r.passed ? "✓" : "✗"}</span>
+            <span className="flex-1 text-brand-black">{r.label}</span>
+            {!r.passed && <span className="text-brand-subtext text-[11px] hidden md:inline">{r.flag}</span>}
+            <span className={`font-bold ${r.passed ? "text-green-600" : "text-red-500"}`}>+{r.points}</span>
           </div>
         ))}
       </div>
@@ -384,14 +384,14 @@ function CompetitorPanel({ competitor }) {
   if (!competitors.length) {
     return (
       <div className="text-center py-8 px-4">
-        <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center">
-          <svg className="w-5 h-5 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-brand-gray border border-brand-border flex items-center justify-center">
+          <svg className="w-5 h-5 text-brand-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"/>
           </svg>
         </div>
-        <p className="text-sm font-bold text-white mb-1">No competitor data</p>
-        <p className="text-xs text-slate-400 max-w-xs mx-auto">
-          Add <code className="bg-slate-700 text-slate-300 px-1 rounded">APIFY_TOKEN</code> in your Vercel environment variables, then re-run the audit to pull live competitor ads.
+        <p className="text-sm font-bold text-brand-black mb-1">No competitor data</p>
+        <p className="text-xs text-brand-muted max-w-xs mx-auto">
+          Add <code className="bg-brand-gray text-brand-subtext px-1 rounded border border-brand-border">APIFY_TOKEN</code> in your Vercel environment variables, then re-run the audit to pull live competitor ads.
         </p>
       </div>
     );
@@ -417,13 +417,13 @@ function CompetitorPanel({ competitor }) {
       {/* Issues */}
       {issues.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[11px] font-bold text-red-400 uppercase tracking-widest">✗ Gaps identified</p>
+          <p className="text-[11px] font-bold text-red-500 uppercase tracking-widest">Gaps identified</p>
           {issues.map((iss, i) => (
-            <div key={i} className="p-3 rounded-lg border bg-red-500/10 border-red-500/30 flex items-start gap-2.5">
-              <span className="text-xs font-bold text-red-400 mt-0.5">✗</span>
+            <div key={i} className="p-3 rounded-lg border bg-red-50 border-red-200 flex items-start gap-2.5">
+              <span className="text-xs font-bold text-red-500 mt-0.5">✗</span>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-slate-200 leading-snug">{iss.message}</p>
-                {iss.fix && <p className="text-[11px] text-slate-400 mt-0.5">{iss.fix}</p>}
+                <p className="text-xs font-semibold text-brand-black leading-snug">{iss.message}</p>
+                {iss.fix && <p className="text-[11px] text-brand-subtext mt-0.5">{iss.fix}</p>}
               </div>
             </div>
           ))}
@@ -433,10 +433,10 @@ function CompetitorPanel({ competitor }) {
       {/* Insights */}
       {insights.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[11px] font-bold text-blue-400 uppercase tracking-widest">💡 Insights</p>
+          <p className="text-[11px] font-bold text-brand-purple uppercase tracking-widest">Insights</p>
           {insights.map((ins, i) => (
-            <div key={i} className="p-3 rounded-lg border bg-blue-500/10 border-blue-500/30">
-              <p className="text-xs text-slate-200 leading-snug">{ins}</p>
+            <div key={i} className="p-3 rounded-lg border bg-brand-purple/5 border-brand-purple/20">
+              <p className="text-xs text-brand-black leading-snug">{ins}</p>
             </div>
           ))}
         </div>
@@ -454,9 +454,9 @@ function CompetitorPanel({ competitor }) {
 
 function BenchStat({ label, value, highlight, isText }) {
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
-      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
-      <p className={`font-bold leading-tight ${isText ? "text-xs" : "text-xl"} ${highlight ? "text-red-400" : "text-white"}`}>
+    <div className="rounded-xl border border-brand-border bg-brand-gray p-3">
+      <p className="text-[10px] font-semibold text-brand-muted uppercase tracking-wider mb-1">{label}</p>
+      <p className={`font-bold leading-tight ${isText ? "text-xs" : "text-xl"} ${highlight ? "text-red-500" : "text-brand-black"}`}>
         {value}
       </p>
     </div>
@@ -468,35 +468,35 @@ function CompetitorCard({ comp }) {
   const ads = comp.ads || [];
 
   return (
-    <div className="border border-slate-700 rounded-xl overflow-hidden">
+    <div className="border border-brand-border rounded-xl overflow-hidden">
       <div
-        className="flex items-center justify-between p-3 bg-slate-800 cursor-pointer hover:bg-slate-700/80 transition-colors"
+        className="flex items-center justify-between p-3 bg-brand-gray cursor-pointer hover:bg-gray-100 transition-colors"
         onClick={() => setOpen((o) => !o)}
       >
         <div className="flex items-center gap-3">
           {comp.is_winning && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400">🏆 Winner</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700">Winner</span>
           )}
-          <p className="text-sm font-bold text-white">{comp.brand}</p>
-          <span className="text-xs text-slate-400">{comp.ad_count} ads</span>
+          <p className="text-sm font-bold text-brand-black">{comp.brand}</p>
+          <span className="text-xs text-brand-muted">{comp.ad_count} ads</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex gap-1">
             {(comp.formats || []).map((f) => (
-              <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 border border-slate-600 text-slate-400 capitalize">{f}</span>
+              <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-white border border-brand-border text-brand-subtext capitalize">{f}</span>
             ))}
           </div>
           {comp.duration_days > 0 && (
-            <span className="text-[11px] text-slate-400 whitespace-nowrap">{comp.duration_days}d running</span>
+            <span className="text-[11px] text-brand-muted whitespace-nowrap">{comp.duration_days}d running</span>
           )}
-          <svg className={`w-4 h-4 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className={`w-4 h-4 text-brand-muted transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
           </svg>
         </div>
       </div>
 
       {open && (
-        <div className="border-t border-slate-700 bg-slate-900 p-3">
+        <div className="border-t border-brand-border bg-white p-3">
           {ads.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {ads.map((ad, i) => (
@@ -505,21 +505,21 @@ function CompetitorCard({ comp }) {
                   href={ad.snapshot_url || `https://www.facebook.com/ads/library/?id=${ad.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-col rounded-lg border border-slate-700 bg-slate-800 overflow-hidden hover:border-slate-500 hover:shadow-lg transition-all"
+                  className="group flex flex-col rounded-lg border border-brand-border bg-brand-gray overflow-hidden hover:border-gray-300 hover:shadow-card transition-all"
                 >
                   {ad.image_url ? (
-                    <img src={ad.image_url} alt="" className="w-full h-28 object-cover bg-slate-700" onError={(e) => { e.target.style.display = "none"; }} />
+                    <img src={ad.image_url} alt="" className="w-full h-28 object-cover bg-brand-gray" onError={(e) => { e.target.style.display = "none"; }} />
                   ) : (
-                    <div className="w-full h-28 bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-full h-28 bg-gray-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                       </svg>
                     </div>
                   )}
                   <div className="p-2">
-                    {ad.title && <p className="text-[11px] font-semibold text-slate-200 line-clamp-1">{ad.title}</p>}
-                    {ad.body  && <p className="text-[10px] text-slate-400 line-clamp-2 mt-0.5">{ad.body}</p>}
-                    <p className="text-[10px] text-blue-400 font-semibold mt-1 group-hover:underline">View ad →</p>
+                    {ad.title && <p className="text-[11px] font-semibold text-brand-black line-clamp-1">{ad.title}</p>}
+                    {ad.body  && <p className="text-[10px] text-brand-subtext line-clamp-2 mt-0.5">{ad.body}</p>}
+                    <p className="text-[10px] text-brand-purple font-semibold mt-1 group-hover:underline">View ad →</p>
                   </div>
                 </a>
               ))}
@@ -528,15 +528,15 @@ function CompetitorCard({ comp }) {
             <div>
               {comp.hooks?.length > 0 ? (
                 <div>
-                  <p className="text-[11px] font-semibold text-slate-400 mb-2">Ad hooks detected:</p>
+                  <p className="text-[11px] font-semibold text-brand-muted mb-2">Ad hooks detected:</p>
                   <div className="flex flex-wrap gap-2">
                     {comp.hooks.map((h, i) => (
-                      <span key={i} className="text-[11px] px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300">"{h}"</span>
+                      <span key={i} className="text-[11px] px-3 py-1.5 rounded-full bg-brand-gray border border-brand-border text-brand-subtext">"{h}"</span>
                     ))}
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-slate-500 text-center py-4">No ad previews available for this competitor.</p>
+                <p className="text-xs text-brand-muted text-center py-4">No ad previews available for this competitor.</p>
               )}
             </div>
           )}
@@ -574,7 +574,7 @@ function computeOutcomes(data) {
   const fmtC = (n) => `AED ${Math.round(n).toLocaleString()}`;
   const outcomes = [];
 
-  // ── IMMEDIATE SAVINGS ────────────────────────────────────────────
+  // IMMEDIATE SAVINGS
   if (wastedSpend > 0) {
     outcomes.push({
       id: "wasted_spend", platform: "google", category: "savings",
@@ -592,24 +592,24 @@ function computeOutcomes(data) {
   if (irrelevant > 0) {
     outcomes.push({
       id: "irrelevant_terms", platform: "google", category: "savings",
-      effort: "Easy", timeframe: "1–2 days",
+      effort: "Easy", timeframe: "1-2 days",
       title: "Cut irrelevant search terms",
       metric: fmtC(irrelevant) + "/mo",
       metricRaw: irrelevant,
       description: "Broad match is showing your ads to people searching for completely different things.",
-      action: "Open Search Terms Report → add negatives for anything irrelevant.",
+      action: "Open Search Terms Report and add negatives for anything irrelevant.",
       confidence: 80,
       icon: "savings",
     });
   }
 
-  // ── SIGNAL RECOVERY ──────────────────────────────────────────────
+  // SIGNAL RECOVERY
   if (mFail("META_PIXEL_CAPI") && metaConv > 0) {
     const recovered = Math.round(metaConv * 0.3);
     const revenueImpact = Math.round(recovered * (metaCpa || 0));
     outcomes.push({
       id: "capi", platform: "meta", category: "revenue",
-      effort: "Medium", timeframe: "3–5 days",
+      effort: "Medium", timeframe: "3-5 days",
       title: "Turn on Conversions API",
       metric: `+${recovered} conversions/mo`,
       metricRaw: revenueImpact,
@@ -621,7 +621,7 @@ function computeOutcomes(data) {
   } else if (mFail("META_PIXEL_CAPI") && metaSpend > 0) {
     outcomes.push({
       id: "capi", platform: "meta", category: "revenue",
-      effort: "Medium", timeframe: "3–5 days",
+      effort: "Medium", timeframe: "3-5 days",
       title: "Turn on Conversions API",
       metric: "~30% more signal",
       metricRaw: Math.round(metaSpend * 0.1),
@@ -632,7 +632,7 @@ function computeOutcomes(data) {
     });
   }
 
-  // ── CTR / CREATIVE UPSIDE ────────────────────────────────────────
+  // CTR / CREATIVE UPSIDE
   if (mFail("META_FRESH_7D") && metaClicks > 0) {
     const uplift = Math.round(metaClicks * 0.18);
     outcomes.push({
@@ -642,7 +642,7 @@ function computeOutcomes(data) {
       metric: `+18% CTR`,
       metricRaw: uplift,
       description: "Your ads haven't changed in 14+ days. People have seen them. CTR drops fast after that.",
-      action: "Upload 2–3 fresh ads this week. Different hook, different format.",
+      action: "Upload 2-3 fresh ads this week. Different hook, different format.",
       confidence: 82,
       icon: "ctr",
     });
@@ -663,16 +663,16 @@ function computeOutcomes(data) {
     });
   }
 
-  // ── FUNNEL GAPS ──────────────────────────────────────────────────
+  // FUNNEL GAPS
   const noFullFunnel = mFail("META_FULL_FUNNEL");
   if (noFullFunnel && metaSpend > 0) {
     const cpaReduction = 0.28;
     const monthlySaving = Math.round(metaSpend * cpaReduction * 0.3);
     outcomes.push({
       id: "full_funnel", platform: "meta", category: "revenue",
-      effort: "Hard", timeframe: "30–60 days",
+      effort: "Hard", timeframe: "30-60 days",
       title: "Build a proper funnel",
-      metric: `−28% CPA`,
+      metric: `-28% CPA`,
       metricRaw: monthlySaving,
       description: "You're going straight for the sale with cold audiences. Warm them up first. It's cheaper.",
       action: "Add awareness and traffic campaigns. Split budget 30% / 20% / 50% across funnel stages.",
@@ -687,7 +687,7 @@ function computeOutcomes(data) {
       id: "retargeting", platform: "meta", category: "revenue",
       effort: "Medium", timeframe: "1 week",
       title: "Add retargeting",
-      metric: `3–5× ROAS`,
+      metric: `3-5x ROAS`,
       metricRaw: retargetingUpside,
       description: "People who visited your site and didn't buy are being ignored. They're your easiest customers.",
       action: "Create retargeting ad sets: site visitors (90d), video viewers (75%), add-to-cart (30d).",
@@ -696,12 +696,12 @@ function computeOutcomes(data) {
     });
   }
 
-  // ── GOOGLE STRUCTURE ─────────────────────────────────────────────
+  // GOOGLE STRUCTURE
   if (gFail("G_BRAND_SPLIT") && googleSpend > 0) {
     const brandProtection = Math.round(googleSpend * 0.08);
     outcomes.push({
       id: "brand_split", platform: "google", category: "efficiency",
-      effort: "Easy", timeframe: "2–3 days",
+      effort: "Easy", timeframe: "2-3 days",
       title: "Split brand vs non-brand",
       metric: `+20% branded CTR`,
       metricRaw: brandProtection,
@@ -715,7 +715,7 @@ function computeOutcomes(data) {
   if (gFail("G_TRACKING") && googleSpend > 0) {
     outcomes.push({
       id: "tracking", platform: "google", category: "signal",
-      effort: "Medium", timeframe: "3–5 days",
+      effort: "Medium", timeframe: "3-5 days",
       title: "Fix GA4 tracking",
       metric: "Unlock Smart Bidding",
       metricRaw: Math.round(googleSpend * 0.15),
@@ -737,23 +737,23 @@ function computeOutcomes(data) {
 }
 
 const ICONS = {
-  savings:    { emoji: "💰", color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
-  signal:     { emoji: "📡", color: "text-blue-400",    bg: "bg-blue-500/10 border-blue-500/20" },
-  revenue:    { emoji: "📈", color: "text-brand-accent", bg: "bg-emerald-500/10 border-emerald-500/20" },
-  ctr:        { emoji: "⚡", color: "text-yellow-400",  bg: "bg-yellow-500/10 border-yellow-500/20" },
-  efficiency: { emoji: "🎯", color: "text-blue-400",    bg: "bg-blue-500/10 border-blue-500/20" },
-  funnel:     { emoji: "🔻", color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20" },
+  savings:    { emoji: "💰", color: "text-green-600",       bg: "bg-green-50 border-green-200" },
+  signal:     { emoji: "📡", color: "text-blue-600",        bg: "bg-blue-50 border-blue-200" },
+  revenue:    { emoji: "📈", color: "text-brand-purple",    bg: "bg-brand-purple/8 border-brand-purple/20" },
+  ctr:        { emoji: "⚡", color: "text-amber-600",       bg: "bg-amber-50 border-amber-200" },
+  efficiency: { emoji: "🎯", color: "text-blue-600",        bg: "bg-blue-50 border-blue-200" },
+  funnel:     { emoji: "🔻", color: "text-orange-500",      bg: "bg-orange-50 border-orange-200" },
 };
 
 const EFFORT_COLOR = {
-  Easy:   "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
-  Medium: "text-yellow-400  bg-yellow-500/10  border-yellow-500/30",
-  Hard:   "text-red-400     bg-red-500/10     border-red-500/30",
+  Easy:   "text-green-700 bg-green-50 border-green-200",
+  Medium: "text-amber-700 bg-amber-50 border-amber-200",
+  Hard:   "text-red-600   bg-red-50   border-red-200",
 };
 
 const PLATFORM_BADGE = {
-  meta:   "bg-blue-500/10 text-blue-400 border-blue-500/30",
-  google: "bg-orange-500/10 text-orange-400 border-orange-500/30",
+  meta:   "bg-blue-50 text-blue-600 border-blue-200",
+  google: "bg-orange-50 text-orange-600 border-orange-200",
 };
 
 function OutcomeEngine({ data }) {
@@ -773,28 +773,28 @@ function OutcomeEngine({ data }) {
     <div className="card p-5">
       {/* Header */}
       <div className="mb-5">
-        <p className="text-xs font-semibold text-brand-blue uppercase tracking-widest mb-1">What to fix</p>
-        <h2 className="text-lg font-bold text-white">Opportunity Engine</h2>
-        <p className="text-xs text-slate-400 mt-0.5">Money left on the table. Based on your actual data.</p>
+        <p className="text-xs font-semibold text-brand-purple uppercase tracking-widest mb-1">What to fix</p>
+        <h2 className="text-lg font-bold text-brand-black">Opportunity Engine</h2>
+        <p className="text-xs text-brand-muted mt-0.5">Money left on the table. Based on your actual data.</p>
       </div>
 
       {/* Summary metric strip */}
       <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider mb-0.5">You are wasting</p>
-          <p className="text-xl font-extrabold text-emerald-400">
-            {totalSavings > 0 ? <>AED {Math.round(totalSavings).toLocaleString()}<span className="text-xs font-medium text-emerald-600">/mo</span></> : "—"}
+        <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-center">
+          <p className="text-[10px] font-semibold text-green-700 uppercase tracking-wider mb-0.5">You are wasting</p>
+          <p className="text-xl font-extrabold text-green-700">
+            {totalSavings > 0 ? <>AED {Math.round(totalSavings).toLocaleString()}<span className="text-xs font-medium text-green-500">/mo</span></> : "—"}
           </p>
         </div>
-        <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold text-blue-400 uppercase tracking-wider mb-0.5">You could earn more</p>
-          <p className="text-xl font-extrabold text-blue-400">
-            {totalRevenue > 0 ? <>AED {Math.round(totalRevenue).toLocaleString()}<span className="text-xs font-medium text-blue-600">/mo</span></> : "—"}
+        <div className="rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-center">
+          <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wider mb-0.5">You could earn more</p>
+          <p className="text-xl font-extrabold text-blue-600">
+            {totalRevenue > 0 ? <>AED {Math.round(totalRevenue).toLocaleString()}<span className="text-xs font-medium text-blue-400">/mo</span></> : "—"}
           </p>
         </div>
-        <div className="rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 text-center">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Fix this week</p>
-          <p className="text-xl font-extrabold text-white">{quickWins}<span className="text-xs font-medium text-slate-500"> things</span></p>
+        <div className="rounded-xl bg-brand-gray border border-brand-border px-4 py-3 text-center">
+          <p className="text-[10px] font-semibold text-brand-muted uppercase tracking-wider mb-0.5">Fix this week</p>
+          <p className="text-xl font-extrabold text-brand-black">{quickWins}<span className="text-xs font-medium text-brand-muted"> things</span></p>
         </div>
       </div>
 
@@ -803,7 +803,7 @@ function OutcomeEngine({ data }) {
         {outcomes.map((o) => {
           const icon = ICONS[o.icon] || ICONS.efficiency;
           return (
-            <div key={o.id} className="rounded-xl border border-slate-700 bg-slate-800/60 p-4 flex flex-col gap-2.5 hover:border-slate-600 transition-all">
+            <div key={o.id} className="rounded-xl border border-brand-border bg-white p-4 flex flex-col gap-2.5 hover:shadow-card transition-all">
               {/* Top row: icon + badges */}
               <div className="flex items-center justify-between">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm border ${icon.bg}`}>
@@ -818,34 +818,34 @@ function OutcomeEngine({ data }) {
               {/* Big metric */}
               <div>
                 <p className={`text-xl font-extrabold leading-none ${icon.color}`}>{o.metric}</p>
-                <p className="text-[10px] text-slate-500 mt-0.5">{o.timeframe}</p>
+                <p className="text-[10px] text-brand-muted mt-0.5">{o.timeframe}</p>
               </div>
 
               {/* Title */}
-              <p className="text-xs font-bold text-slate-200 leading-snug">{o.title}</p>
+              <p className="text-xs font-bold text-brand-black leading-snug">{o.title}</p>
 
               {/* Description */}
-              <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-3">{o.description}</p>
+              <p className="text-[11px] text-brand-subtext leading-relaxed line-clamp-3">{o.description}</p>
 
               {/* Fix hint */}
-              <div className="border-t border-slate-700 pt-2.5 mt-auto">
-                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Fix</p>
-                <p className="text-[11px] text-slate-300 leading-snug line-clamp-2">{o.action}</p>
+              <div className="border-t border-brand-border pt-2.5 mt-auto">
+                <p className="text-[10px] font-semibold text-brand-muted uppercase tracking-wider mb-0.5">Fix</p>
+                <p className="text-[11px] text-brand-subtext leading-snug line-clamp-2">{o.action}</p>
               </div>
 
               {/* Confidence bar */}
               <div className="flex items-center gap-2 mt-0.5">
-                <div className="flex-1 h-1 bg-slate-700 rounded-full">
-                  <div className="h-full bg-brand-accent rounded-full transition-all" style={{ width: `${o.confidence}%` }} />
+                <div className="flex-1 h-1 bg-brand-gray rounded-full">
+                  <div className="h-full bg-brand-purple rounded-full transition-all" style={{ width: `${o.confidence}%` }} />
                 </div>
-                <span className="text-[10px] font-bold text-slate-500">{o.confidence}% conf.</span>
+                <span className="text-[10px] font-bold text-brand-muted">{o.confidence}% conf.</span>
               </div>
             </div>
           );
         })}
       </div>
 
-      <p className="text-[11px] text-slate-600 mt-4 text-center">Based on benchmarks + your actual spend. Results vary.</p>
+      <p className="text-[11px] text-brand-muted mt-4 text-center">Based on benchmarks + your actual spend. Results vary.</p>
     </div>
   );
 }

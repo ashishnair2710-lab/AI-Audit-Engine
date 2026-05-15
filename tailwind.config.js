@@ -8,34 +8,41 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          navy:       "#0F172A",   // Deep SaaS dark navy — primary dark
-          card:       "#1E293B",   // Dark card surface
-          cardborder: "#334155",   // Border on dark cards
-          accent:     "#22C55E",   // Growth green — primary action
-          accenthov:  "#16A34A",   // Green hover state
-          blue:       "#3B82F6",   // Intelligence blue — data / links
-          bluehov:    "#2563EB",   // Blue hover
-          bg:         "#F8FAFC",   // Page background
-          surface:    "#F1F5F9",   // Slightly darker page surface
-          white:      "#FFFFFF",
-          border:     "#E2E8F0",   // Light border (light bg areas)
-          text:       "#111827",   // Dark text (light bg areas)
-          subtext:    "#374151",
-          muted:      "#6B7280",   // Muted text (light bg areas)
-          red:        "#EF4444",
-          orange:     "#F97316",
-          yellow:     "#EAB308",
-          green:      "#22C55E",
+          purple:      "#6B5FE4",
+          purplelight: "#8B7FF5",
+          purplehov:   "#5A4FD4",
+          yellow:      "#F5A623",
+          yellowhov:   "#E09520",
+          black:       "#111111",
+          white:       "#FFFFFF",
+          gray:        "#F5F5F5",
+          border:      "#E5E5E5",
+          muted:       "#9CA3AF",
+          subtext:     "#374151",
+          // backward-compat aliases
+          navy:        "#111111",
+          text:        "#111111",
+          accent:      "#6B5FE4",
+          accenthov:   "#5A4FD4",
+          blue:        "#6B5FE4",
+          bluehov:     "#5A4FD4",
+          bg:          "#F5F5F5",
+          surface:     "#FFFFFF",
+          card:        "#FFFFFF",
+          cardborder:  "#E5E5E5",
+          red:         "#EF4444",
+          orange:      "#F97316",
+          green:       "#22C55E",
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Outfit", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card:      "0 1px 4px 0 rgba(0,0,0,0.25), 0 1px 2px -1px rgba(0,0,0,0.2)",
-        lifted:    "0 4px 24px 0 rgba(34,197,94,0.15)",
-        glow:      "0 0 24px 0 rgba(34,197,94,0.25)",
-        "glow-blue":"0 0 24px 0 rgba(59,130,246,0.2)",
+        card:       "0 1px 3px 0 rgba(0,0,0,0.07), 0 1px 2px -1px rgba(0,0,0,0.04)",
+        lifted:     "0 4px 24px 0 rgba(107,95,228,0.14)",
+        glow:       "0 0 20px 0 rgba(107,95,228,0.18)",
+        "glow-yel": "0 0 20px 0 rgba(245,166,35,0.18)",
       },
       animation: {
         "fade-in":  "fadeIn 0.35s ease-out",
