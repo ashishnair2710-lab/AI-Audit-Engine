@@ -736,13 +736,33 @@ function computeOutcomes(data) {
     });
 }
 
+/* ── Outcome icon SVGs ── */
+function IcoMoney() {
+  return <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9.5 9.5a2.5 2.5 0 015 0c0 1.5-1 2-2.5 2.5S9.5 13 9.5 14.5a2.5 2.5 0 005 0"/></svg>;
+}
+function IcoSignal() {
+  return <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M1.5 8.5a13 13 0 0121 0M5 12a10 10 0 0114 0M8.5 15.5a6 6 0 017 0M12 19h.01"/></svg>;
+}
+function IcoTrend() {
+  return <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>;
+}
+function IcoBolt() {
+  return <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>;
+}
+function IcoTarget() {
+  return <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>;
+}
+function IcoFunnel() {
+  return <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>;
+}
+
 const ICONS = {
-  savings:    { emoji: "💰", color: "text-green-600",       bg: "bg-green-50 border-green-200" },
-  signal:     { emoji: "📡", color: "text-blue-600",        bg: "bg-blue-50 border-blue-200" },
-  revenue:    { emoji: "📈", color: "text-brand-purple",    bg: "bg-brand-purple/8 border-brand-purple/20" },
-  ctr:        { emoji: "⚡", color: "text-amber-600",       bg: "bg-amber-50 border-amber-200" },
-  efficiency: { emoji: "🎯", color: "text-blue-600",        bg: "bg-blue-50 border-blue-200" },
-  funnel:     { emoji: "🔻", color: "text-orange-500",      bg: "bg-orange-50 border-orange-200" },
+  savings:    { icon: <IcoMoney />,  color: "text-green-600",    bg: "bg-green-50 border-green-200" },
+  signal:     { icon: <IcoSignal />, color: "text-brand-purple", bg: "bg-purple-50 border-purple-200" },
+  revenue:    { icon: <IcoTrend />,  color: "text-brand-purple", bg: "bg-purple-50 border-purple-200" },
+  ctr:        { icon: <IcoBolt />,   color: "text-amber-600",    bg: "bg-amber-50 border-amber-200" },
+  efficiency: { icon: <IcoTarget />, color: "text-brand-purple", bg: "bg-purple-50 border-purple-200" },
+  funnel:     { icon: <IcoFunnel />, color: "text-orange-600",   bg: "bg-orange-50 border-orange-200" },
 };
 
 const EFFORT_COLOR = {
@@ -806,8 +826,8 @@ function OutcomeEngine({ data }) {
             <div key={o.id} className="rounded-xl border border-brand-border bg-white p-4 flex flex-col gap-2.5 hover:shadow-card transition-all">
               {/* Top row: icon + badges */}
               <div className="flex items-center justify-between">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm border ${icon.bg}`}>
-                  {icon.emoji}
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${icon.color} ${icon.bg}`}>
+                  {icon.icon}
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${PLATFORM_BADGE[o.platform]}`}>{o.platform.toUpperCase()}</span>
