@@ -61,7 +61,7 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
         {toast && (
           <div className={`fixed top-20 right-6 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-semibold animate-slide-up ${
             toast.type === "success"
-              ? "bg-brand-green text-brand-navy"
+              ? "bg-brand-purple text-brand-black"
               : "bg-red-500 text-white"
           }`}>
             {toast.msg}
@@ -71,8 +71,8 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
         <main className="pt-28 pb-20 px-6 max-w-3xl mx-auto">
           {/* Header */}
           <div className="mb-10 animate-fade-in">
-            <h1 className="text-3xl font-extrabold text-brand-navy mb-2">Connect Ad Accounts</h1>
-            <p className="text-slate-500">
+            <h1 className="text-3xl font-extrabold text-brand-black mb-2">Connect Ad Accounts</h1>
+            <p className="text-brand-subtext">
               Connect your Meta and Google Ads accounts to run audits on live campaign data automatically.
             </p>
           </div>
@@ -90,14 +90,14 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
               permissions={["ads_read", "ads_management", "business_management"]}
             >
               {metaConnected && accounts.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-slate-100">
+                <div className="mt-4 pt-4 border-t border-brand-border">
                   <label className="block text-xs font-semibold text-brand-muted uppercase tracking-widest mb-2">
                     Select Ad Account
                   </label>
                   <select
                     value={selected}
                     onChange={(e) => pickAccount(e.target.value)}
-                    className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:border-brand-purple"
+                    className="w-full text-sm border border-brand-border rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:border-brand-purple"
                   >
                     <option value="">Choose an account</option>
                     {accounts.map((a) => (
@@ -127,14 +127,14 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
           </div>
 
           {/* Security note */}
-          <div className="mt-8 p-5 rounded-xl bg-brand-navy/4 border border-brand-navy/10">
+          <div className="mt-8 p-5 rounded-xl bg-brand-gray border border-brand-border">
             <div className="flex gap-3">
-              <svg className="w-5 h-5 text-brand-blue flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-brand-purple flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
               </svg>
               <div>
-                <p className="text-brand-navy font-semibold text-sm mb-1">Read-only access only</p>
-                <p className="text-slate-500 text-xs leading-relaxed">
+                <p className="text-brand-black font-semibold text-sm mb-1">Read-only access only</p>
+                <p className="text-brand-subtext text-xs leading-relaxed">
                   We only request read permissions. Tokens are stored in secure httpOnly cookies, never in a database or shared with third parties. We cannot make changes to your campaigns.
                 </p>
               </div>
@@ -158,36 +158,36 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
 function PlatformCard({ platform, description, icon, connected, accountLabel, connectHref, onDisconnect, permissions, children }) {
   return (
     <div className={`bg-white rounded-2xl border shadow-card p-6 transition-all duration-200 ${
-      connected ? "border-brand-green/30" : "border-slate-200"
+      connected ? "border-brand-purple/30" : "border-brand-border"
     }`}>
       <div className="flex items-start gap-4">
         {/* Icon */}
-        <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+        <div className="w-12 h-12 rounded-xl bg-brand-gray flex items-center justify-center flex-shrink-0">
           {icon}
         </div>
 
         {/* Content */}
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-1">
-            <h3 className="font-bold text-brand-navy text-lg">{platform}</h3>
+            <h3 className="font-bold text-brand-black text-lg">{platform}</h3>
             {connected && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-green/10 border border-brand-green/30 text-brand-green text-xs font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-green" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-purple/10 border border-brand-purple/30 text-brand-purple text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-purple" />
                 Connected
               </span>
             )}
           </div>
 
           {accountLabel && (
-            <p className="text-sm text-brand-blue font-medium mb-2">{accountLabel}</p>
+            <p className="text-sm text-brand-purple font-medium mb-2">{accountLabel}</p>
           )}
 
-          <p className="text-slate-500 text-sm mb-4">{description}</p>
+          <p className="text-brand-subtext text-sm mb-4">{description}</p>
 
           {/* Permissions */}
           <div className="flex flex-wrap gap-2 mb-4">
             {permissions.map((p) => (
-              <span key={p} className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-500 text-xs font-medium">
+              <span key={p} className="px-2.5 py-1 rounded-md bg-brand-gray text-brand-subtext text-xs font-medium">
                 {p}
               </span>
             ))}
@@ -197,7 +197,7 @@ function PlatformCard({ platform, description, icon, connected, accountLabel, co
           {connected ? (
             <button
               onClick={onDisconnect}
-              className="text-sm text-slate-400 hover:text-red-500 font-medium transition-colors"
+              className="text-sm text-brand-muted hover:text-red-500 font-medium transition-colors"
             >
               Disconnect account
             </button>

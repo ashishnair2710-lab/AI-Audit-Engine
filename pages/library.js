@@ -54,7 +54,7 @@ export default function LibraryPage() {
           {/* Header */}
           <div className="mb-8">
             <p className="text-xs font-semibold text-brand-purple uppercase tracking-widest mb-1">Competitor Intelligence</p>
-            <h1 className="text-2xl font-bold text-brand-navy">Facebook Ads Library</h1>
+            <h1 className="text-2xl font-bold text-brand-black">Facebook Ads Library</h1>
             <p className="text-sm text-brand-muted mt-1">Search any brand's live ads to benchmark creatives, hooks, and formats.</p>
           </div>
 
@@ -64,12 +64,12 @@ export default function LibraryPage() {
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
               placeholder="Brand name, e.g. Chivas Regal"
-              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:border-brand-purple"
+              className="flex-1 text-sm border border-brand-border rounded-lg px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple"
             />
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="text-sm border border-slate-200 rounded-lg px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:border-brand-purple"
+              className="text-sm border border-brand-border rounded-lg px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple"
             >
               {COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>{c.label}</option>
@@ -113,11 +113,11 @@ export default function LibraryPage() {
               <div className="card p-4 flex flex-wrap gap-6 items-center">
                 <div>
                   <p className="text-xs text-brand-muted uppercase tracking-wider font-semibold">Brand</p>
-                  <p className="text-base font-bold text-brand-navy mt-0.5">{result.brand}</p>
+                  <p className="text-base font-bold text-brand-black mt-0.5">{result.brand}</p>
                 </div>
                 <div>
                   <p className="text-xs text-brand-muted uppercase tracking-wider font-semibold">Active Ads Found</p>
-                  <p className="text-base font-bold text-brand-navy mt-0.5">{result.ad_count}</p>
+                  <p className="text-base font-bold text-brand-black mt-0.5">{result.ad_count}</p>
                 </div>
                 <div>
                   <p className="text-xs text-brand-muted uppercase tracking-wider font-semibold">Formats</p>
@@ -132,14 +132,14 @@ export default function LibraryPage() {
                 </div>
                 <div>
                   <p className="text-xs text-brand-muted uppercase tracking-wider font-semibold">Longest Running</p>
-                  <p className="text-base font-bold text-brand-navy mt-0.5">{result.duration_days > 0 ? `${result.duration_days}d` : "—"}</p>
+                  <p className="text-base font-bold text-brand-black mt-0.5">{result.duration_days > 0 ? `${result.duration_days}d` : "—"}</p>
                 </div>
               </div>
 
               {/* Hooks */}
               {result.hooks?.length > 0 && (
                 <div className="card p-5">
-                  <h3 className="text-sm font-bold text-brand-navy mb-3">Ad Hooks Detected</h3>
+                  <h3 className="text-sm font-bold text-brand-black mb-3">Ad Hooks Detected</h3>
                   <div className="flex flex-wrap gap-2">
                     {result.hooks.map((h, i) => (
                       <span key={i} className="text-xs px-3 py-1.5 bg-brand-bg border border-brand-border rounded-full text-brand-text leading-snug">
@@ -153,7 +153,7 @@ export default function LibraryPage() {
               {/* Ad cards */}
               {result.ads?.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-bold text-brand-navy mb-3">Live Ad Previews</h3>
+                  <h3 className="text-sm font-bold text-brand-black mb-3">Live Ad Previews</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {result.ads.map((ad) => (
                       <AdCard key={ad.id} ad={ad} />
@@ -164,7 +164,7 @@ export default function LibraryPage() {
 
               {result.ad_count === 0 && (
                 <div className="card p-10 text-center">
-                  <p className="text-sm font-semibold text-brand-navy">No ads found</p>
+                  <p className="text-sm font-semibold text-brand-black">No ads found</p>
                   <p className="text-xs text-brand-muted mt-1">Try a different brand name or country.</p>
                 </div>
               )}
@@ -187,8 +187,8 @@ function AdCard({ ad }) {
     video: { label: "Video", cls: "bg-blue-50 text-blue-600 border-blue-200" },
     carousel: { label: "Carousel", cls: "bg-amber-50 text-amber-600 border-amber-200" },
     dynamic: { label: "Dynamic", cls: "bg-violet-50 text-violet-600 border-violet-200" },
-    image: { label: "Image", cls: "bg-slate-100 text-slate-500 border-slate-200" },
-  }[ad.format] || { label: ad.format || "Ad", cls: "bg-slate-100 text-slate-500 border-slate-200" };
+    image: { label: "Image", cls: "bg-brand-gray text-brand-muted border-brand-border" },
+  }[ad.format] || { label: ad.format || "Ad", cls: "bg-brand-gray text-brand-muted border-brand-border" };
 
   const startDate = ad.start
     ? toDate(ad.start).toLocaleDateString("en-AE", { day: "numeric", month: "short", year: "numeric" })
@@ -201,11 +201,11 @@ function AdCard({ ad }) {
         <img
           src={ad.image_url}
           alt=""
-          className="w-full h-44 object-cover bg-slate-100"
+          className="w-full h-44 object-cover bg-brand-gray"
           onError={(e) => { e.target.style.display = "none"; }}
         />
       ) : (
-        <div className="w-full h-20 bg-gradient-to-br from-purple-50 to-slate-100 flex items-center justify-center">
+        <div className="w-full h-20 bg-gradient-to-br from-purple-50 to-brand-gray flex items-center justify-center">
           <svg className="w-8 h-8 text-purple-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
@@ -217,14 +217,14 @@ function AdCard({ ad }) {
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             {ad.page_picture && (
-              <img src={ad.page_picture} alt="" className="w-6 h-6 rounded-full bg-slate-100 flex-shrink-0" onError={(e) => { e.target.style.display = "none"; }} />
+              <img src={ad.page_picture} alt="" className="w-6 h-6 rounded-full bg-brand-gray flex-shrink-0" onError={(e) => { e.target.style.display = "none"; }} />
             )}
-            <p className="text-xs font-bold text-brand-navy truncate">{ad.page_name}</p>
+            <p className="text-xs font-bold text-brand-black truncate">{ad.page_name}</p>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${fmtLabel.cls}`}>{fmtLabel.label}</span>
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-              ad.is_active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-100 text-slate-500 border-slate-200"
+              ad.is_active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-brand-gray text-brand-muted border-brand-border"
             }`}>{ad.is_active ? "Live" : "Ended"}</span>
           </div>
         </div>
@@ -237,14 +237,14 @@ function AdCard({ ad }) {
         <div className="flex flex-wrap items-center gap-2 text-[11px] text-brand-muted">
           {startDate    && <span>Started {startDate}</span>}
           {ad.impressions && <span>· {ad.impressions}</span>}
-          {ad.cta        && <span className="px-2 py-0.5 rounded bg-brand-bg border border-brand-border font-medium text-brand-text">{ad.cta}</span>}
+          {ad.cta        && <span className="px-2 py-0.5 rounded bg-brand-gray border border-brand-border font-medium text-brand-black">{ad.cta}</span>}
         </div>
 
         {/* Platforms */}
         {ad.platforms?.length > 0 && (
           <div className="flex gap-1 flex-wrap">
             {ad.platforms.map((p) => (
-              <span key={p} className="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-500 capitalize">{p}</span>
+              <span key={p} className="text-[10px] px-2 py-0.5 rounded bg-brand-gray text-slate-500 capitalize">{p}</span>
             ))}
           </div>
         )}
