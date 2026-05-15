@@ -51,7 +51,7 @@ export default function ResultsPage() {
           {/* 1. TOP BAR */}
           <div className="pt-3 flex items-center justify-between flex-wrap gap-3">
             <div>
-              <p className="text-xs font-semibold text-brand-purple uppercase tracking-widest mb-1">Performance Audit</p>
+              <p className="text-xs font-semibold text-brand-purple uppercase tracking-widest mb-1">Audit Results</p>
               <h1 className="text-2xl font-bold text-brand-black">{clientName}</h1>
             </div>
             <div className="flex items-center gap-2">
@@ -738,7 +738,7 @@ function computeOutcomes(data) {
 
 /* ── Outcome icon SVGs ── */
 function IcoMoney() {
-  return <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9.5 9.5a2.5 2.5 0 015 0c0 1.5-1 2-2.5 2.5S9.5 13 9.5 14.5a2.5 2.5 0 005 0"/></svg>;
+  return <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
 }
 function IcoSignal() {
   return <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M1.5 8.5a13 13 0 0121 0M5 12a10 10 0 0114 0M8.5 15.5a6 6 0 017 0M12 19h.01"/></svg>;
@@ -794,7 +794,7 @@ function OutcomeEngine({ data }) {
       {/* Header */}
       <div className="mb-5">
         <p className="text-xs font-semibold text-brand-purple uppercase tracking-widest mb-1">What to fix</p>
-        <h2 className="text-lg font-bold text-brand-black">Opportunity Engine</h2>
+        <h2 className="text-lg font-bold text-brand-black">What to Fix</h2>
         <p className="text-xs text-brand-muted mt-0.5">Money left on the table. Based on your actual data.</p>
       </div>
 

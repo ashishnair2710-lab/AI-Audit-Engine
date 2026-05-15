@@ -193,7 +193,7 @@ export default function HomePage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-12">
               {[
                 { value: "700+",  label: "Checks run",     color: "text-brand-purple" },
-                { value: "2",     label: "Platforms",       color: "text-brand-purple" },
+                { value: "7+",    label: "Platforms",       color: "text-brand-purple" },
                 { value: "60s",   label: "Audit runtime",   color: "text-brand-yellow" },
                 { value: "Free",  label: "Cost to run",     color: "text-green-600"    },
               ].map((s) => (
@@ -298,7 +298,7 @@ function ChartIcon() {
   return <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>;
 }
 function MoneyIcon() {
-  return <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9.5 9.5a2.5 2.5 0 015 0c0 1.5-1 2-2.5 2.5S9.5 13 9.5 14.5a2.5 2.5 0 005 0"/></svg>;
+  return <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
 }
 function BoltIcon() {
   return <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>;

@@ -114,14 +114,14 @@ const mockAuditPayload = {
       formats:      ["video", "image", "carousel"],
       hooks:        [
         "Free delivery on all orders",
-        "Limited time — 30% off",
+        "Limited time. 30% off",
         "Trusted by 50,000 customers",
         "Fast shipping guaranteed",
       ],
       duration_days: 45,
       ads: [
         { id: "1", page_name: "CompetitorA", title: "Free delivery on all orders", body: "Shop now and get free shipping on every order over AED 150.", image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
-        { id: "2", page_name: "CompetitorA", title: "Limited time — 30% off",      body: "Huge savings this week only. Don't miss out.",               image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
+        { id: "2", page_name: "CompetitorA", title: "Limited time. 30% off",      body: "Huge savings this week only. Don't miss out.",               image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
         { id: "3", page_name: "CompetitorA", title: "Trusted by 50,000 customers", body: "Join thousands of happy customers across the UAE.",           image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
       ],
     },
@@ -130,13 +130,13 @@ const mockAuditPayload = {
       ad_count:     14,
       formats:      ["video", "image"],
       hooks:        [
-        "Exclusive deals — shop now",
+        "Exclusive deals. Shop now",
         "Quality you can trust",
         "Easy returns",
       ],
       duration_days: 18,
       ads: [
-        { id: "4", page_name: "CompetitorB", title: "Exclusive deals — shop now", body: "Hand-picked offers, refreshed daily.", image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
+        { id: "4", page_name: "CompetitorB", title: "Exclusive deals. Shop now", body: "Hand-picked offers, refreshed daily.", image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
         { id: "5", page_name: "CompetitorB", title: "Easy 30-day returns",        body: "Not happy? Send it back. No questions asked.", image_url: "", snapshot_url: "https://www.facebook.com/ads/library/" },
       ],
     },
