@@ -233,16 +233,19 @@ function PlatformMetrics({ platform, data }) {
   );
 }
 
-/* ── Ad name / brand helpers ── */
+/* ── Ad name / brand / format helpers ── */
 function cleanAdName(raw) {
   if (!raw) return "Untitled Ad";
-  // Pipe format: "Chivas | Purchase | Interest" → "Chivas · Purchase · Interest"
-  if (raw.includes("|")) return raw.split("|").map((s) => s.trim()).filter(Boolean).join(" · ");
-  // Underscore/hyphen format: "Post3_reel_chivas-regal_ao_en" → readable
+  // Pipe format: "Chivas | Purchase | Interest" → use middle segment as the descriptor
+  if (raw.includes("|")) {
+    const parts = raw.split("|").map((s) => s.trim()).filter(Boolean);
+    return parts.length >= 2 ? parts.slice(1).join(" · ") : parts[0];
+  }
+  // Underscore/hyphen internal naming: strip noise words and brand suffixes
   return raw
     .replace(/[_]/g, " ")
     .replace(/-/g, " ")
-    .replace(/\b(ao|en|reel|static|post\d*)\b/gi, "")
+    .replace(/\b(ao|en|reel|static|post\d*|square|vertical|story|stories|\d+s)\b/gi, "")
     .replace(/\s+/g, " ")
     .trim()
     .replace(/\b\w/g, (c) => c.toUpperCase()) || "Untitled Ad";
@@ -251,14 +254,23 @@ function cleanAdName(raw) {
 function extractBrand(raw) {
   if (!raw) return "Ad";
   if (raw.includes("|")) return raw.split("|")[0].trim();
-  const branded = raw.match(/([a-z]+(?:[- ][a-z]+){1,3})(?:_ao|_en|$)/i);
-  if (branded) return branded[1].replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  // Try to find a multi-word brand in the middle of underscore names
+  const parts = raw.split("_").filter((p) =>
+    p.length > 2 && !/^\d+s?$/.test(p) &&
+    !["reel","static","ao","en","square","vertical","story","stories","post","video","image"].includes(p.toLowerCase())
+  );
+  if (parts.length > 0) return parts[0].replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   return raw.split(/[_-]/)[0].replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function cleanFormat(fmt) {
   if (!fmt) return "Image";
-  if (fmt.toUpperCase().includes("PRIVACY") || fmt.toUpperCase().includes("FAIL")) return "Image";
+  const up = fmt.toUpperCase();
+  if (up.includes("PRIVACY") || up.includes("FAIL")) return "Image";
+  if (up === "SHARE" || up === "STATUS") return "Post";
+  if (up === "CAROUSEL") return "Carousel";
+  if (up === "VIDEO") return "Video";
+  if (up === "IMAGE") return "Image";
   return fmt.charAt(0).toUpperCase() + fmt.slice(1).toLowerCase();
 }
 
@@ -272,65 +284,63 @@ function AdPostCard({ c, tone }) {
   const format  = cleanFormat(c.format);
   const initial = brand.charAt(0).toUpperCase();
   const isVideo = format.toLowerCase() === "video";
-  const hasSrc  = c.thumbnail && !c.thumbnail.includes("PRIVACY") && !c.thumbnail.includes("fail");
+  const hasSrc  = c.thumbnail &&
+    !c.thumbnail.toUpperCase().includes("PRIVACY") &&
+    !c.thumbnail.toUpperCase().includes("FAIL");
 
   return (
-    <div className="rounded-2xl border border-brand-border bg-white overflow-hidden">
-      {/* Post header — mimics a sponsored post */}
-      <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-brand-border">
-        <div className="w-8 h-8 rounded-full bg-brand-purple flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-xs font-bold">{initial}</span>
+    <div className="rounded-xl border border-brand-border bg-white overflow-hidden flex-shrink-0 w-[220px]">
+      {/* Post header */}
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-brand-border">
+        <div className="w-7 h-7 rounded-full bg-brand-purple flex items-center justify-center flex-shrink-0">
+          <span className="text-white text-[11px] font-bold">{initial}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-bold text-brand-black leading-none truncate">{brand}</p>
-          <p className="text-[10px] text-brand-muted mt-0.5">Sponsored</p>
+          <p className="text-[11px] font-bold text-brand-black leading-none truncate">{brand}</p>
+          <p className="text-[9px] text-brand-muted mt-0.5">Sponsored</p>
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-brand-muted bg-brand-gray border border-brand-border px-1.5 py-0.5 rounded-md flex-shrink-0">
+        <span className="text-[9px] font-semibold uppercase tracking-wide text-brand-muted bg-brand-gray border border-brand-border px-1.5 py-0.5 rounded flex-shrink-0">
           {format}
         </span>
       </div>
 
-      {/* Creative area — 16:9 */}
-      <div className="w-full bg-[#F0F0F0] relative" style={{ aspectRatio: "16/9" }}>
+      {/* Creative thumbnail — square 1:1 */}
+      <div className="w-full bg-[#EBEBEB]" style={{ aspectRatio: "1/1" }}>
         {hasSrc ? (
           <img src={c.thumbnail} alt={adName} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-brand-muted">
+          <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
             {isVideo ? (
-              <svg className="w-10 h-10 opacity-25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
               </svg>
             ) : (
-              <svg className="w-10 h-10 opacity-25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
               </svg>
             )}
-            <span className="text-[10px] text-brand-muted font-medium">Preview not available</span>
+            <span className="text-[9px] text-gray-400">No preview</span>
           </div>
         )}
       </div>
 
-      {/* Ad copy line */}
+      {/* Ad name */}
       <div className="px-3 py-2 border-b border-brand-border">
-        <p className="text-[13px] font-semibold text-brand-black leading-snug line-clamp-2">{adName}</p>
+        <p className="text-[11px] font-semibold text-brand-black line-clamp-2 leading-snug">{adName}</p>
       </div>
 
-      {/* Metrics footer */}
-      <div className="px-3 py-2 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5">
-          <span className={`text-[11px] font-bold border px-2 py-1 rounded-lg whitespace-nowrap ${chip}`}>
-            {Number(c.ctr || 0).toFixed(2)}% CTR
-          </span>
-          {c.spend > 0 && (
-            <span className="text-[10px] text-brand-muted whitespace-nowrap">
-              AED {Math.round(c.spend).toLocaleString()} spent
-            </span>
-          )}
-        </div>
+      {/* Metrics */}
+      <div className="px-3 py-2 flex items-center justify-between gap-1">
+        <span className={`text-[10px] font-bold border px-1.5 py-0.5 rounded-md whitespace-nowrap ${chip}`}>
+          {Number(c.ctr || 0).toFixed(2)}% CTR
+        </span>
+        {c.spend > 0 && (
+          <span className="text-[9px] text-brand-muted truncate">AED {Math.round(c.spend).toLocaleString()}</span>
+        )}
         {c.preview_url && (
           <a href={c.preview_url} target="_blank" rel="noopener noreferrer"
-            className="text-[10px] text-brand-purple font-semibold hover:underline flex items-center gap-0.5 whitespace-nowrap flex-shrink-0">
-            View ad ↗
+            className="text-[9px] text-brand-purple font-semibold hover:underline whitespace-nowrap flex-shrink-0">
+            View ↗
           </a>
         )}
       </div>
@@ -353,8 +363,8 @@ function CreativePanel({ title, subtitle, tone, creatives }) {
       {creatives.length === 0 ? (
         <p className="text-xs text-brand-muted py-6 text-center">No data yet.</p>
       ) : (
-        <div className="space-y-3">
-          {creatives.slice(0, 3).map((c, i) => (
+        <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+          {creatives.slice(0, 5).map((c, i) => (
             <AdPostCard key={i} c={c} tone={tone} />
           ))}
         </div>
