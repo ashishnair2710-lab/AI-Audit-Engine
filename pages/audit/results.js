@@ -305,61 +305,51 @@ function AdPostCard({ c, tone }) {
     !c.thumbnail.toUpperCase().includes("FAIL");
 
   return (
-    <div className="rounded-xl border border-brand-border bg-white overflow-hidden flex-shrink-0 w-[220px]">
-      {/* Post header */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-brand-border">
-        <div className="w-7 h-7 rounded-full bg-brand-purple flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-[11px] font-bold">{initial}</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-bold text-brand-black leading-none truncate">{brand}</p>
-          <p className="text-[9px] text-brand-muted mt-0.5">Sponsored</p>
-        </div>
-        <span className="text-[9px] font-semibold uppercase tracking-wide text-brand-muted bg-brand-gray border border-brand-border px-1.5 py-0.5 rounded flex-shrink-0">
+    <div className="flex items-center gap-3 p-3 rounded-xl border border-brand-border bg-white hover:border-gray-300 transition-colors">
+      {/* Thumbnail — small accent, not hero */}
+      <div className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-[#F0F0F0] border border-brand-border relative">
+        {hasSrc ? (
+          <img src={c.thumbnail} alt={adName} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            {isVideo ? (
+              <svg className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            )}
+          </div>
+        )}
+        {/* Format pill overlaid on thumbnail */}
+        <span className="absolute bottom-0.5 left-0.5 text-[8px] font-bold uppercase bg-black/50 text-white px-1 rounded leading-4">
           {format}
         </span>
       </div>
 
-      {/* Creative thumbnail — square 1:1 */}
-      <div className="w-full bg-[#EBEBEB]" style={{ aspectRatio: "1/1" }}>
-        {hasSrc ? (
-          <img src={c.thumbnail} alt={adName} className="w-full h-full object-contain bg-white" />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
-            {isVideo ? (
-              <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-              </svg>
-            ) : (
-              <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-            )}
-            <span className="text-[9px] text-gray-400">No preview</span>
-          </div>
-        )}
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <p className="text-[12px] font-semibold text-brand-black leading-snug truncate">{adName}</p>
+        <p className="text-[10px] text-brand-muted mt-0.5 truncate">{brand}</p>
+        <div className="flex items-center gap-2 mt-1.5">
+          <span className={`text-[10px] font-bold border px-1.5 py-0.5 rounded-md whitespace-nowrap ${chip}`}>
+            {Number(c.ctr || 0).toFixed(2)}% CTR
+          </span>
+          {c.spend > 0 && (
+            <span className="text-[10px] text-brand-muted">AED {Math.round(c.spend).toLocaleString()}</span>
+          )}
+        </div>
       </div>
 
-      {/* Ad name */}
-      <div className="px-3 py-2 border-b border-brand-border">
-        <p className="text-[11px] font-semibold text-brand-black line-clamp-2 leading-snug">{adName}</p>
-      </div>
-
-      {/* Metrics */}
-      <div className="px-3 py-2 flex items-center justify-between gap-1">
-        <span className={`text-[10px] font-bold border px-1.5 py-0.5 rounded-md whitespace-nowrap ${chip}`}>
-          {Number(c.ctr || 0).toFixed(2)}% CTR
-        </span>
-        {c.spend > 0 && (
-          <span className="text-[9px] text-brand-muted truncate">AED {Math.round(c.spend).toLocaleString()}</span>
-        )}
-        {c.preview_url && (
-          <a href={c.preview_url} target="_blank" rel="noopener noreferrer"
-            className="text-[9px] text-brand-purple font-semibold hover:underline whitespace-nowrap flex-shrink-0">
-            View ↗
-          </a>
-        )}
-      </div>
+      {/* View link */}
+      {c.preview_url && (
+        <a href={c.preview_url} target="_blank" rel="noopener noreferrer"
+          className="flex-shrink-0 text-[10px] text-brand-purple font-semibold hover:underline">
+          View ↗
+        </a>
+      )}
     </div>
   );
 }
@@ -379,8 +369,8 @@ function CreativePanel({ title, subtitle, tone, creatives }) {
       {creatives.length === 0 ? (
         <p className="text-xs text-brand-muted py-6 text-center">No data yet.</p>
       ) : (
-        <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          {creatives.slice(0, 5).map((c, i) => (
+        <div className="space-y-2">
+          {creatives.slice(0, 4).map((c, i) => (
             <AdPostCard key={i} c={c} tone={tone} />
           ))}
         </div>
