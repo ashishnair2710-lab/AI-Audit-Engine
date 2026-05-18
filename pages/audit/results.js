@@ -305,51 +305,64 @@ function AdPostCard({ c, tone }) {
     !c.thumbnail.toUpperCase().includes("FAIL");
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-xl border border-brand-border bg-white hover:border-gray-300 transition-colors">
-      {/* Thumbnail — small accent, not hero */}
-      <div className="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-[#F0F0F0] border border-brand-border relative">
-        {hasSrc ? (
-          <img src={c.thumbnail} alt={adName} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            {isVideo ? (
-              <svg className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-              </svg>
-            ) : (
-              <svg className="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-            )}
+    <div className="relative flex-shrink-0 w-[140px] rounded-2xl overflow-hidden border border-brand-border bg-[#1a1a1a]"
+         style={{ aspectRatio: "9/16" }}>
+
+      {/* Full-bleed background image */}
+      {hasSrc ? (
+        <img src={c.thumbnail} alt={adName}
+             className="absolute inset-0 w-full h-full object-cover" />
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#2a2a2a]">
+          {isVideo ? (
+            <svg className="w-8 h-8 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          ) : (
+            <svg className="w-8 h-8 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          )}
+          <span className="text-[9px] text-white/30 font-medium">No preview</span>
+        </div>
+      )}
+
+      {/* Gradient overlay — top */}
+      <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/60 to-transparent" />
+
+      {/* Gradient overlay — bottom */}
+      <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 to-transparent" />
+
+      {/* Top: brand + format */}
+      <div className="absolute top-0 inset-x-0 flex items-center justify-between px-2 pt-2">
+        <div className="flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded-full bg-brand-purple flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-[8px] font-bold">{initial}</span>
           </div>
-        )}
-        {/* Format pill overlaid on thumbnail */}
-        <span className="absolute bottom-0.5 left-0.5 text-[8px] font-bold uppercase bg-black/50 text-white px-1 rounded leading-4">
+          <span className="text-white text-[9px] font-semibold leading-none truncate max-w-[70px]">{brand}</span>
+        </div>
+        <span className="text-[8px] font-bold uppercase text-white/70 bg-white/15 px-1.5 py-0.5 rounded-full">
           {format}
         </span>
       </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-semibold text-brand-black leading-snug truncate">{adName}</p>
-        <p className="text-[10px] text-brand-muted mt-0.5 truncate">{brand}</p>
-        <div className="flex items-center gap-2 mt-1.5">
-          <span className={`text-[10px] font-bold border px-1.5 py-0.5 rounded-md whitespace-nowrap ${chip}`}>
+      {/* Bottom: ad name + metrics */}
+      <div className="absolute bottom-0 inset-x-0 px-2 pb-2">
+        <p className="text-white text-[10px] font-semibold leading-snug line-clamp-2 mb-1.5">{adName}</p>
+        <div className="flex items-center justify-between gap-1">
+          <span className={`text-[9px] font-bold border px-1.5 py-0.5 rounded-full whitespace-nowrap ${chip}`}>
             {Number(c.ctr || 0).toFixed(2)}% CTR
           </span>
-          {c.spend > 0 && (
-            <span className="text-[10px] text-brand-muted">AED {Math.round(c.spend).toLocaleString()}</span>
-          )}
+          {c.preview_url ? (
+            <a href={c.preview_url} target="_blank" rel="noopener noreferrer"
+               className="text-[9px] text-white/70 font-semibold hover:text-white whitespace-nowrap">
+              View ↗
+            </a>
+          ) : c.spend > 0 ? (
+            <span className="text-[9px] text-white/50">AED {Math.round(c.spend).toLocaleString()}</span>
+          ) : null}
         </div>
       </div>
-
-      {/* View link */}
-      {c.preview_url && (
-        <a href={c.preview_url} target="_blank" rel="noopener noreferrer"
-          className="flex-shrink-0 text-[10px] text-brand-purple font-semibold hover:underline">
-          View ↗
-        </a>
-      )}
     </div>
   );
 }
@@ -369,8 +382,8 @@ function CreativePanel({ title, subtitle, tone, creatives }) {
       {creatives.length === 0 ? (
         <p className="text-xs text-brand-muted py-6 text-center">No data yet.</p>
       ) : (
-        <div className="space-y-2">
-          {creatives.slice(0, 4).map((c, i) => (
+        <div className="flex gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          {creatives.slice(0, 6).map((c, i) => (
             <AdPostCard key={i} c={c} tone={tone} />
           ))}
         </div>
