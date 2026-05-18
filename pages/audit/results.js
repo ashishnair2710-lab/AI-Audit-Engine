@@ -234,33 +234,49 @@ function PlatformMetrics({ platform, data }) {
 }
 
 /* ── Ad name / brand / format helpers ── */
+const NOISE_WORDS = new Set([
+  "ao","en","reel","static","square","vertical","story","stories",
+  "video","image","post","share","status","carousel","ad","ads",
+]);
+function isNoise(s) {
+  return NOISE_WORDS.has(s.toLowerCase()) || /^\d/.test(s);
+}
+
+// For underscore filenames: brand is the LAST hyphenated multi-word segment
+// e.g. "refreshments_square_chivas-regal_ao_en" → "Chivas Regal"
+function extractBrand(raw) {
+  if (!raw) return "Ad";
+  if (raw.includes("|")) return raw.split("|")[0].trim();
+  // Find segments that contain a hyphen (compound brand name like "chivas-regal")
+  const segments = raw.split("_");
+  const brandSeg = [...segments].reverse().find((s) => s.includes("-") && s.length > 3);
+  if (brandSeg) return brandSeg.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  // Fallback: last non-noise segment
+  const meaningful = segments.filter((s) => s.length > 2 && !isNoise(s));
+  const pick = meaningful[meaningful.length - 1] || segments[0];
+  return pick.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+// Ad name = the FIRST meaningful descriptor (not the brand, not noise)
+// e.g. "refreshments_square_chivas-regal_ao_en" → "Refreshments"
 function cleanAdName(raw) {
   if (!raw) return "Untitled Ad";
-  // Pipe format: "Chivas | Purchase | Interest" → use middle segment as the descriptor
   if (raw.includes("|")) {
     const parts = raw.split("|").map((s) => s.trim()).filter(Boolean);
     return parts.length >= 2 ? parts.slice(1).join(" · ") : parts[0];
   }
-  // Underscore/hyphen internal naming: strip noise words and brand suffixes
-  return raw
-    .replace(/[_]/g, " ")
-    .replace(/-/g, " ")
-    .replace(/\b(ao|en|reel|static|post\d*|square|vertical|story|stories|\d+s)\b/gi, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/\b\w/g, (c) => c.toUpperCase()) || "Untitled Ad";
-}
-
-function extractBrand(raw) {
-  if (!raw) return "Ad";
-  if (raw.includes("|")) return raw.split("|")[0].trim();
-  // Try to find a multi-word brand in the middle of underscore names
-  const parts = raw.split("_").filter((p) =>
-    p.length > 2 && !/^\d+s?$/.test(p) &&
-    !["reel","static","ao","en","square","vertical","story","stories","post","video","image"].includes(p.toLowerCase())
+  const segments = raw.split("_");
+  // Strip the brand segment (hyphenated) and noise words, keep descriptors
+  const brand = extractBrand(raw).toLowerCase().replace(/ /g, "-");
+  const descriptors = segments.filter((s) =>
+    !s.toLowerCase().replace(/-/g, " ").includes(brand.replace(/-/g, " ")) &&
+    !isNoise(s) &&
+    s.length > 1
   );
-  if (parts.length > 0) return parts[0].replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  return raw.split(/[_-]/)[0].replace(/\b\w/g, (c) => c.toUpperCase());
+  if (descriptors.length === 0) return extractBrand(raw);
+  return descriptors
+    .map((s) => s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()))
+    .join(" ");
 }
 
 function cleanFormat(fmt) {
@@ -307,7 +323,7 @@ function AdPostCard({ c, tone }) {
       {/* Creative thumbnail — square 1:1 */}
       <div className="w-full bg-[#EBEBEB]" style={{ aspectRatio: "1/1" }}>
         {hasSrc ? (
-          <img src={c.thumbnail} alt={adName} className="w-full h-full object-cover" />
+          <img src={c.thumbnail} alt={adName} className="w-full h-full object-contain bg-white" />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
             {isVideo ? (
