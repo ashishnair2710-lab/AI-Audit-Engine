@@ -128,6 +128,14 @@ export default function ResultsPage() {
             <GoogleAdsPanel ads={data.google_top_ads} />
           )}
 
+          {/* 4c. SEARCH TERMS PANEL */}
+          {google.summary?.irrelevant_terms?.length > 0 && (
+            <SearchTermsPanel
+              terms={google.summary.irrelevant_terms}
+              totalSpend={google.summary.irrelevant_spend}
+            />
+          )}
+
           {/* 5. FUNNEL HEALTH PANEL */}
           <div className="card p-5">
             <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
@@ -240,7 +248,14 @@ function PlatformMetrics({ platform, data }) {
     { label: "Conversions",      value: fmt(data.total_conversions),   sub: data.cpa ? `CPA ${fmtC(data.cpa)}` : null },
     { label: "Conv. Value",      value: fmtC(data.total_conv_value),   sub: data.avg_roas > 0 ? `ROAS ${fmtX(data.avg_roas)}` : null },
     { label: "Wasted Spend",     value: fmtC(data.wasted_spend),       sub: data.wasted_campaigns > 0 ? `${data.wasted_campaigns} campaign(s) ROAS < 1` : null, highlight: data.wasted_spend > 0 ? "red" : null },
-    { label: "Irrelevant Terms", value: fmtC(data.irrelevant_spend),   sub: "Estimated from broad match", highlight: data.irrelevant_spend > 0 ? "amber" : null },
+    {
+      label: "Irrelevant Terms",
+      value: fmtC(data.irrelevant_spend),
+      sub: data.irrelevant_source === "search_terms_report"
+        ? `${(data.irrelevant_terms || []).length} zero-conv terms`
+        : "Broad match estimate",
+      highlight: data.irrelevant_spend > 0 ? "amber" : null,
+    },
     { label: "CTR",              value: fmtP(data.blended_ctr),        sub: `${fmt(data.total_clicks)} clicks` },
   ];
 
@@ -416,6 +431,62 @@ function CreativePanel({ title, subtitle, tone, creatives }) {
             <AdPostCard key={i} c={c} tone={tone} />
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+// ── Search terms waste panel ─────────────────────────────────────────
+function SearchTermsPanel({ terms, totalSpend }) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? terms : terms.slice(0, 6);
+
+  return (
+    <div className="card p-5">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="w-2 h-2 rounded-full bg-amber-500" />
+        <h3 className="text-xs font-bold uppercase tracking-widest text-amber-600">Wasted Search Terms</h3>
+        <span className="ml-auto text-[11px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+          AED {Math.round(totalSpend).toLocaleString()} at risk
+        </span>
+      </div>
+      <p className="text-[11px] text-brand-muted mb-4">
+        These search terms triggered your ads, spent budget, and drove zero conversions with low CTR. Add them as negative keywords.
+      </p>
+
+      {/* Table */}
+      <div className="rounded-xl border border-brand-border overflow-hidden">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="bg-brand-gray border-b border-brand-border">
+              <th className="text-left px-3 py-2 font-semibold text-brand-muted uppercase tracking-wider text-[10px]">Search Term</th>
+              <th className="text-right px-3 py-2 font-semibold text-brand-muted uppercase tracking-wider text-[10px]">Spend</th>
+              <th className="text-right px-3 py-2 font-semibold text-brand-muted uppercase tracking-wider text-[10px]">Clicks</th>
+              <th className="text-right px-3 py-2 font-semibold text-brand-muted uppercase tracking-wider text-[10px]">CTR</th>
+              <th className="text-right px-3 py-2 font-semibold text-brand-muted uppercase tracking-wider text-[10px] hidden sm:table-cell">Conv.</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map((t, i) => (
+              <tr key={i} className={`border-b border-brand-border last:border-0 hover:bg-amber-50/40 transition-colors ${i % 2 === 0 ? "bg-white" : "bg-brand-gray/30"}`}>
+                <td className="px-3 py-2.5 font-medium text-brand-black max-w-[180px] truncate">{t.term}</td>
+                <td className="px-3 py-2.5 text-right font-bold text-amber-600">AED {Math.round(t.spend).toLocaleString()}</td>
+                <td className="px-3 py-2.5 text-right text-brand-subtext">{t.clicks}</td>
+                <td className="px-3 py-2.5 text-right text-brand-subtext">{Number(t.ctr).toFixed(2)}%</td>
+                <td className="px-3 py-2.5 text-right text-red-500 font-bold hidden sm:table-cell">0</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {terms.length > 6 && (
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-3 text-[11px] text-brand-purple font-semibold hover:underline w-full text-center"
+        >
+          {expanded ? "Show less" : `Show all ${terms.length} terms →`}
+        </button>
       )}
     </div>
   );
