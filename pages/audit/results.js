@@ -123,6 +123,11 @@ export default function ResultsPage() {
             <CreativePanel title="Drain Ads"       subtitle="High spend · low CTR" tone="kill" creatives={killMeta} />
           </div>
 
+          {/* 4b. GOOGLE ADS PANEL */}
+          {data.google_top_ads && data.google_top_ads.length > 0 && (
+            <GoogleAdsPanel ads={data.google_top_ads} />
+          )}
+
           {/* 5. FUNNEL HEALTH PANEL */}
           <div className="card p-5">
             <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
@@ -412,6 +417,74 @@ function CreativePanel({ title, subtitle, tone, creatives }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Google SERP-style ad preview panel ──────────────────────────────
+function GoogleAdsPanel({ ads }) {
+  return (
+    <div className="card p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <span className="w-2 h-2 rounded-full bg-orange-500" />
+        <h3 className="text-xs font-bold uppercase tracking-widest text-orange-500">Google Ads</h3>
+        <span className="ml-auto text-[11px] text-brand-muted">Top {ads.length} search ads by spend</span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {ads.map((ad, i) => (
+          <GoogleAdCard key={ad.ad_id || i} ad={ad} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function GoogleAdCard({ ad }) {
+  const headline    = (ad.headlines   || []).join(" | ") || "—";
+  const description = (ad.descriptions || []).join(" ") || "";
+  const url         = ad.display_url || ad.final_url || "";
+  const domain      = url ? url.replace(/^https?:\/\//, "").replace(/\/.*$/, "") : "";
+
+  return (
+    <div className="rounded-xl border border-brand-border bg-white p-3.5 hover:border-gray-300 hover:shadow-sm transition-all">
+      {/* Simulated SERP header */}
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <span className="text-[9px] font-bold uppercase border border-[#006621] text-[#006621] px-1 py-0.5 rounded-sm leading-none tracking-wide">
+          Ad
+        </span>
+        {domain && (
+          <span className="text-[11px] text-[#006621] truncate">{domain}</span>
+        )}
+        <span className="text-[10px] text-brand-muted ml-auto whitespace-nowrap">
+          {ad.campaign_name ? ad.campaign_name.slice(0, 22) + (ad.campaign_name.length > 22 ? "…" : "") : ""}
+        </span>
+      </div>
+
+      {/* Headline */}
+      <p className="text-sm font-semibold text-[#1a0dab] leading-snug line-clamp-2 mb-1">{headline}</p>
+
+      {/* Description */}
+      {description && (
+        <p className="text-[11px] text-brand-subtext leading-snug line-clamp-2">{description}</p>
+      )}
+
+      {/* Metrics */}
+      <div className="flex items-center gap-3 mt-2.5 pt-2 border-t border-brand-border/60 flex-wrap">
+        {ad.ctr != null && (
+          <span className="text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded-md">
+            {Number(ad.ctr).toFixed(2)}% CTR
+          </span>
+        )}
+        {ad.spend > 0 && (
+          <span className="text-[10px] text-brand-muted">AED {Math.round(ad.spend).toLocaleString()}</span>
+        )}
+        {ad.impressions > 0 && (
+          <span className="text-[10px] text-brand-muted">{Number(ad.impressions).toLocaleString()} impr</span>
+        )}
+        {ad.conversions > 0 && (
+          <span className="text-[10px] text-brand-muted ml-auto">{ad.conversions} conv</span>
+        )}
+      </div>
     </div>
   );
 }
