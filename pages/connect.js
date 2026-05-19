@@ -3,11 +3,13 @@ import { useRouter }           from "next/router";
 import Head                    from "next/head";
 import Navbar                  from "../components/Navbar";
 
-export default function ConnectPage({ metaConnected, googleConnected, metaAccountName, googleAccountEmail, metaAccountId }) {
+export default function ConnectPage({ metaConnected, googleConnected, metaAccountName, googleAccountEmail, metaAccountId, googleAccountId }) {
   const router  = useRouter();
-  const [toast, setToast]       = useState(null);
-  const [accounts, setAccounts] = useState([]);
-  const [selected, setSelected] = useState(metaAccountId || "");
+  const [toast, setToast]             = useState(null);
+  const [accounts, setAccounts]       = useState([]);
+  const [selected, setSelected]       = useState(metaAccountId || "");
+  const [gAccounts, setGAccounts]     = useState([]);
+  const [gSelected, setGSelected]     = useState(googleAccountId || "");
 
   useEffect(() => {
     const { success, error } = router.query;
@@ -27,6 +29,17 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
       .catch(() => {});
   }, [metaConnected]);
 
+  useEffect(() => {
+    if (!googleConnected) return;
+    fetch("/api/auth/google/accounts")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.accounts)) setGAccounts(d.accounts);
+        if (d.selected) setGSelected(d.selected);
+      })
+      .catch(() => {});
+  }, [googleConnected]);
+
   async function pickAccount(id) {
     const acc = accounts.find((a) => a.id === id);
     setSelected(id);
@@ -34,6 +47,17 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ account_id: id, account_name: acc?.name || "" }),
+    });
+    showToast(`Selected ${acc?.name || id}`, "success");
+  }
+
+  async function pickGoogleAccount(id) {
+    const acc = gAccounts.find((a) => a.id === id);
+    setGSelected(id);
+    await fetch("/api/auth/google/select-account", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ customer_id: id, account_name: acc?.name || "" }),
     });
     showToast(`Selected ${acc?.name || id}`, "success");
   }
@@ -123,7 +147,30 @@ export default function ConnectPage({ metaConnected, googleConnected, metaAccoun
               connectHref="/api/auth/google"
               onDisconnect={() => disconnect("google")}
               permissions={["Google Ads read access", "User email (display only)"]}
-            />
+            >
+              {googleConnected && gAccounts.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-brand-border">
+                  <label className="block text-xs font-semibold text-brand-muted uppercase tracking-widest mb-2">
+                    Select Customer Account
+                  </label>
+                  <select
+                    value={gSelected}
+                    onChange={(e) => pickGoogleAccount(e.target.value)}
+                    className="w-full text-sm border border-brand-border rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/30 focus:border-brand-purple"
+                  >
+                    <option value="">Choose an account</option>
+                    {gAccounts.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name} ({a.currency || "—"})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-brand-muted mt-1.5">
+                    {gAccounts.length} account{gAccounts.length === 1 ? "" : "s"} available
+                  </p>
+                </div>
+              )}
+            </PlatformCard>
           </div>
 
           {/* Security note */}
@@ -258,6 +305,7 @@ export async function getServerSideProps({ req }) {
       metaAccountName:    get("meta_account_name")    || null,
       metaAccountId:      get("meta_ad_account_id")   || null,
       googleAccountEmail: get("google_account_email") || null,
+      googleAccountId:    get("google_customer_id")   || null,
     },
   };
 }
