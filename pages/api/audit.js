@@ -81,12 +81,23 @@ export default async function handler(req, res) {
       });
     }
 
+    // ── Determine mode early so all analyzers use the same value ─────────────
+    // Auto-detect from data if no override supplied
+    function autoDetectMode(meta, google) {
+      const sigs = [
+        ...(meta?.campaigns?.map((c) => c.objective || c.type) || []),
+        ...(google?.campaigns?.map((c) => c.objective || c.type) || []),
+      ].filter(Boolean).map((s) => String(s).toLowerCase());
+      return sigs.some((s) => /lead|form|signup|registration/i.test(s)) ? "leadgen" : "ecom";
+    }
+    const resolvedMode = modeOverride || autoDetectMode(meta_data, google_data);
+
     // ── Run analysis pipeline ─────────────────────────────────────────────
-    const metaResult       = meta_data     ? analyzeMeta(meta_data)                         : emptyMeta();
-    const googleResult     = google_data   ? analyzeGoogle(google_data)                     : emptyGoogle();
+    const metaResult       = meta_data     ? analyzeMeta(meta_data, resolvedMode)                         : emptyMeta();
+    const googleResult     = google_data   ? analyzeGoogle(google_data, resolvedMode)                     : emptyGoogle();
     const competitorResult = competitor_data ? analyzeCompetitors(competitor_data, meta_data) : emptyCompetitor();
     const crossInsights    = generateCrossInsights(metaResult, googleResult);
-    const scoreResult      = calculateScore(metaResult, googleResult, competitorResult, modeOverride);
+    const scoreResult      = calculateScore(metaResult, googleResult, competitorResult, resolvedMode);
     const report           = generateReport(metaResult, googleResult, competitorResult, crossInsights, scoreResult);
 
     return res.status(200).json({
