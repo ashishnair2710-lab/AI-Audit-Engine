@@ -196,7 +196,7 @@ export default function HomePage() {
                 { value: "700+",  label: "Checks run",     color: "text-brand-purple" },
                 { value: "7+",    label: "Platforms",       color: "text-brand-purple" },
                 { value: "60s",   label: "Audit runtime",   color: "text-brand-yellow" },
-                { value: "Free",  label: "Cost to run",     color: "text-green-600"    },
+                { value: "AI",    label: "Analyses efficiently", color: "text-green-600" },
               ].map((s) => (
                 <div key={s.label} className="card p-4 text-center">
                   <p className={`text-2xl font-extrabold ${s.color} mb-0.5`}>{s.value}</p>
