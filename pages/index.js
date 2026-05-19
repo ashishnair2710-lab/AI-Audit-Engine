@@ -66,11 +66,11 @@ export default function HomePage() {
           {/* HERO */}
           <div className="text-center mb-12 animate-fade-in">
             <h1 className="text-5xl sm:text-6xl font-extrabold text-brand-black leading-[1.1] mb-4 tracking-tight">
-              {userName ? `Hey ${userName.split(" ")[0]},` : "Full Funnel"}<br />
-              <span className="text-brand-purple">{userName ? "what broke this week?" : "Audit Engine"}</span>
+              {userName ? `${userName.split(" ")[0]},` : "Let's dig into"}<br />
+              <span className="text-brand-purple">{userName ? "let's dig into your ads." : "your ads."}</span>
             </h1>
             <p className="text-brand-subtext text-lg max-w-md mx-auto leading-relaxed">
-              See where your ad budget is leaking. Fix what matters first.
+              Spot what's wasting budget, find what's working, and get a clear path to fix it.
             </p>
           </div>
 
