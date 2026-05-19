@@ -5,10 +5,11 @@ import Navbar from "../../components/Navbar";
 
 export default function ResultsPage() {
   const router = useRouter();
-  const [data, setData]   = useState(null);
-  const [error, setError] = useState("");
-  const [tab, setTab]     = useState("overview");
+  const [data, setData]         = useState(null);
+  const [error, setError]       = useState("");
+  const [tab, setTab]           = useState("overview");
   const [showFull, setShowFull] = useState(false);
+  const [switching, setSwitching] = useState(false);
 
   useEffect(() => {
     if (!sessionStorage.getItem("auth")) { router.push("/login"); return; }
@@ -16,6 +17,24 @@ export default function ResultsPage() {
     if (!stored) { setError("No audit result found."); return; }
     try { setData(JSON.parse(stored)); } catch { setError("Could not parse result."); }
   }, []);
+
+  async function switchMode(newMode) {
+    setSwitching(true);
+    try {
+      const payload = JSON.parse(sessionStorage.getItem("auditPayload") || "{}");
+      const res  = await fetch("/api/audit", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ ...payload, mode_override: newMode }),
+      });
+      const result = await res.json();
+      if (!res.ok) { setSwitching(false); return; }
+      sessionStorage.setItem("auditResult",  JSON.stringify(result));
+      sessionStorage.setItem("auditPayload", JSON.stringify({ ...payload, mode_override: newMode }));
+      setData(result);
+    } catch { /* silently ignore */ }
+    setSwitching(false);
+  }
 
   if (error) return (
     <div className="min-h-screen bg-brand-gray flex items-center justify-center">
@@ -55,13 +74,30 @@ export default function ResultsPage() {
               <h1 className="text-2xl font-bold text-brand-black">{clientName}</h1>
             </div>
             <div className="flex items-center gap-2">
-              <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
-                mode === "ecom"
-                  ? "bg-blue-50 text-blue-600 border-blue-200"
-                  : "bg-amber-50 text-amber-700 border-amber-200"
-              }`}>
-                {mode === "ecom" ? "eCommerce" : "Lead Generation"}
-              </span>
+              {/* Mode toggle */}
+              <div className="flex items-center bg-white border border-brand-border rounded-full p-0.5 gap-0.5">
+                <button
+                  onClick={() => mode !== "ecom" && switchMode("ecom")}
+                  disabled={switching}
+                  className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full transition-all ${
+                    mode === "ecom"
+                      ? "bg-brand-purple text-white shadow-sm"
+                      : "text-brand-muted hover:text-brand-black"
+                  }`}>
+                  eCommerce
+                </button>
+                <button
+                  onClick={() => mode !== "leadgen" && switchMode("leadgen")}
+                  disabled={switching}
+                  className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full transition-all ${
+                    mode === "leadgen"
+                      ? "bg-brand-purple text-white shadow-sm"
+                      : "text-brand-muted hover:text-brand-black"
+                  }`}>
+                  Lead Gen
+                </button>
+              </div>
+              {switching && <div className="w-4 h-4 border-2 border-brand-purple border-t-transparent rounded-full animate-spin" />}
               <span className="text-xs text-brand-muted bg-white border border-brand-border px-3 py-1.5 rounded-full">
                 {new Date().toLocaleDateString("en-AE", { day: "numeric", month: "short", year: "numeric" })}
               </span>

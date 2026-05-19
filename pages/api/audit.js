@@ -15,7 +15,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    let { meta_data, google_data, competitor_data, competitor_brands, use_live_data, days, client_name } = req.body;
+    let { meta_data, google_data, competitor_data, competitor_brands, use_live_data, days, client_name, mode_override } = req.body;
+    const validModes = ["ecom", "leadgen"];
+    const modeOverride = validModes.includes(mode_override) ? mode_override : null;
     const lookbackDays = days === "lifetime" ? "lifetime" : (Number(days) || 30);
 
     // ── Live competitor data: try Apify first, fall back to Meta API ──────
@@ -84,7 +86,7 @@ export default async function handler(req, res) {
     const googleResult     = google_data   ? analyzeGoogle(google_data)                     : emptyGoogle();
     const competitorResult = competitor_data ? analyzeCompetitors(competitor_data, meta_data) : emptyCompetitor();
     const crossInsights    = generateCrossInsights(metaResult, googleResult);
-    const scoreResult      = calculateScore(metaResult, googleResult, competitorResult);
+    const scoreResult      = calculateScore(metaResult, googleResult, competitorResult, modeOverride);
     const report           = generateReport(metaResult, googleResult, competitorResult, crossInsights, scoreResult);
 
     return res.status(200).json({

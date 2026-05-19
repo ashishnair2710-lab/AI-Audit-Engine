@@ -44,7 +44,8 @@ export default function HomePage() {
         setLoading(false);
         return;
       }
-      sessionStorage.setItem("auditResult", JSON.stringify(data));
+      sessionStorage.setItem("auditResult",  JSON.stringify(data));
+      sessionStorage.setItem("auditPayload", JSON.stringify(body));
       router.push("/audit/results");
     } catch {
       setError("Network error. Please try again.");
