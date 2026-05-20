@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./pages/**/*.{js,jsx,ts,tsx}",
+    "./app/**/*.{js,jsx,ts,tsx}",
     "./components/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
@@ -36,7 +37,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["Outfit", "system-ui", "sans-serif"],
+        sans: ["var(--font-outfit)", "Outfit", "system-ui", "sans-serif"],
       },
       boxShadow: {
         card:       "0 1px 3px 0 rgba(0,0,0,0.07), 0 1px 2px -1px rgba(0,0,0,0.04)",
